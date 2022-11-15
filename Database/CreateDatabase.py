@@ -16,22 +16,27 @@ base = declarative_base()
 
 class TestsType (base):
     __tablename__ = 'TestsType'
-    connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
+    #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     ID = Column(Integer, primary_key = True)
     Name = Column(String(32), nullable=False) #Type of test
+    Variable = Column(String(32)) #Type of test
+    Unit = Column(String(32)) #Type of test
     
-    def __init__ (self, ID, Name):
+    def __init__ (self, ID, Name, Variable, Unit):
         self.ID = ID
         self.Name  = Name 
+        self.Variable = Variable
+        self.Unit = Unit
 
 class Divers(base):
     __tablename__ = 'Divers'
-    connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
+    #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
-    Name = Column(String(32), nullable=False)
-    Company = Column(String(32), nullable=False)
-    IOT = Active = Column(LargeBinary)
+    Name = Column(String(32))
+    Company = Column(String(32))
+    IOT = Column(LargeBinary)
+    Active = Column(LargeBinary)
     
     def __init__ (self, ID, Name, Company, IOT, Active):
         self.ID = ID
@@ -43,7 +48,7 @@ class Divers(base):
     
 class VariablesDivers(base):
     __tablename__ = 'VariablesDivers'
-    connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
+    #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
     Name = Column(String(32), nullable=False) #pH, Temperature, 
@@ -61,7 +66,7 @@ class VariablesDivers(base):
 
 class Drills (base):
     __tablename__ = 'Drills'
-    connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
+    #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
     Name = Column(String(32), nullable=False)
@@ -71,6 +76,9 @@ class Drills (base):
     Depth = Column(Float)
     E = Column (Float)
     N = Column (Float)
+    
+    #relationship
+    # DrillTests = relationship("DrillingTests", back_populates ="Test") #Dad: one-to-many relationship
 
     def __init__ (self, ID, Name, DescriptionData, Well, DrillingTest, Depth, E, N):
         self.ID = ID
@@ -84,29 +92,49 @@ class Drills (base):
 
 #table to register the drill measurements 
 #there is a connection with Drills
-class DrillingTests (base):
-    __tablename__ = 'DrillingTests'
-    connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
+# class DrillingTests (base):
+#     __tablename__ = 'DrillingTests'
+#     #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
+    
+#     ID = Column(Integer, primary_key = True)  
+#     DrillID = Column(Integer, ForeignKey("Drills.ID")) #connects to drill 
+#     TypeID = Column(Integer, ForeignKey("TestsType.ID")) #connects to TestType - Dad
+#     Observation = Column (String(64))    
+    
+#     #relationship
+#     # Test = relationship('Drills', back_populates  = 'DrillTests' ) # Child: one-to-many 
+    
+#     def __init__ (self, ID, DrillID, TypeID, Observation):
+#         self.ID = ID
+#         self.DrillID = DrillID
+#         self.TypeID = TypeID
+#         self.Observation = Observation   
+        
+class HydroTests (base):
+    __tablename__ = 'HydroTests'
+    #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)  
-    DrillID = Column(Integer, ForeignKey("Drills.ID")) #connects to drill
-    TypeID = Column(Integer, ForeignKey("TestsType.ID"))
-    Date = Column(Date)
-    Observation = Column (String(256))
+    DrillID = Column(Integer, ForeignKey("Drills.ID")) #connects to drill 
+    Depth = Column (Integer, nullable = False)
+    TestTypeID = Column(Integer, ForeignKey("TestsType.ID")) #connects to TestType - Dad
+    Value = Column (String(64))    
     
-
-    def __init__ (self, ID, DrillID, TypeID, Date, Observation):
+    #relationship
+    # Test = relationship('Drills', back_populates  = 'DrillTests' ) # Child: one-to-many 
+    
+    def __init__ (self, ID, DrillID, Depth, TestTypeID, Value):
         self.ID = ID
         self.DrillID = DrillID
-        self.TypeID = TypeID
-        self.Date = Date
-        self.Observation = Observation
+        self.Depth = Depth
+        self.TestTypeID = TestTypeID
+        self.Value = Value
         
 # It is connected to Drills also 
 #coordinates can be retrieved based on this connection
 class Wells (base):
     __tablename__ = 'Wells'
-    connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
+    #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
     Name = Column(String(32), nullable=False)
@@ -136,7 +164,7 @@ class Wells (base):
 #two foreign keys
 class WellDiver(base):
     __tablename__ = 'WellDiver'
-    connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
+    #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
     WellID = Column(Integer, ForeignKey('Wells.ID'))
@@ -150,9 +178,9 @@ class WellDiver(base):
         self.DiverDepth = DiverDepth
 
     
-class DiverMeasurements(base):
-    __tablename__ = 'DiverMeasurements'
-    connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
+class DiversMeasurements(base):
+    __tablename__ = 'DiversMeasurements'
+    #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
     
@@ -164,23 +192,23 @@ class DiverMeasurements(base):
     '''
         
     WellID = Column(Integer, ForeignKey('Wells.ID'))
-    
-    
     Date = Column (Date)
     Hour = Column(Integer)
     Variable = Column (Integer, ForeignKey('VariablesDivers.ID'))
     Head = Column(Integer)
     
-    def __init__ (self, ID, WellID, Hour, Variable, Head):
+    def __init__ (self, ID, WellID, Date, Hour, Variable, Head):
         self.ID = ID
         self.WellID = WellID
+        self.Date = Date
         self.Hour = Hour
         self.Variable = Variable
         self.Head = Head
     
 
 base.metadata.create_all(engine)
-        
+
+
 
 #retrieving Table as dataframe
 def Access_df (table):

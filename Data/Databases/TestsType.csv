@@ -1,0 +1,5 @@
+ID,Name,Variable,Unit
+0,Sieving,K,m/s
+1,Slug Test,K,m/s
+2,DPIL,K-r,L/h/bar
+3,EC logs,EC,mS/cm

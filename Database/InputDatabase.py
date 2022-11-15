@@ -4,76 +4,70 @@ from sqlalchemy.orm import sessionmaker
 import pandas as pd
 import os
 import random
+import numpy as np
 
-
-#new session
+# new session
 Session = sessionmaker(bind = db.engine)
 session = Session()
 
 
-#MeasurementsType
-'''
-Check Here
-'''
-Measurements_list = ['HPT', 'Slug Test', X`'DPIL', 'Pumping Test']
-
-for i, Measurement in enumerate(Measurements_list):
-    tr = db.MeasurementsType(i, Measurement)
-    session.add(tr)
-    
 
 
-#Divers
-
-
-#VariablesDivers
-
-
-#Drills
-
-
-#VariablesDivers
-
-
-
-#Drills
 path = 'D:\\Repos\\PirnaCaseStudy\\Data\\Databases'
+Tables_list = ['Divers', 'WellDiver', 'TestsType', 
+                'HydroTests', 'Drills', 'Wells', 
+                'VariablesDivers' , 'DiversMeasurements']
+
 os.chdir(path)
-df = pd.read_csv('Drills.csv')
-df['Measurement'][0]=1
-df = df.fillna(0) #all that is na does not exist - false - not present
-df['Measurement'] = df['Measurement'].astype(int)
 
-for i, row in enumerate(df.iterrows()):
-    row = row[1]    
-    DrillID = i#.to_bytes(2, byteorder = 'big')
-    DrillName = str(row[0])
-    DescriptionData = row[1].to_bytes(2, byteorder = 'big')
-    Well = row[2].to_bytes(2, byteorder = 'big')
-    Measurement = row[3].to_bytes(2, byteorder = 'big')
-    E = row[4]
-    N = row[5]
-    Depth = row[6]
+'''
+generate .csv files
+'''
+# for sheet in Tables_list:
+#     df = pd.read_excel('TablesDatabase.xlsx', sheet_name = sheet)
+#     df.to_csv(f'{sheet}.csv', index = False)
+
+
+def InputDatabase (table , func ):
+    df = pd.read_csv(f'{table}.csv') #iterator here #need to convert str to var
+    columns = df.columns
     
-    tr = db.Drills(DrillID, DrillName, DescriptionData, Well, Measurement, E, N, Depth)
-    session.add(tr)
+    #modify the table. Convert interger to bites in binary columns
+    if table != 'DiversMeasurements':
+        for col in columns:
+            unique = df[col].unique()
+            if np.array_equal(unique, unique.astype(bool)): #True for binary arrays
+                li = [x.to_bytes(2, byteorder = 'big') for x in df[col]]
+                df[col] = li
+    else:
+        df['Date'] = pd.to_datetime(df['Date'],  format = '%Y/%m/%d' )
+    #input data
+    for i, row in enumerate(df.iterrows()):
+        values = row[1]
+               
+        tr = func(*values)
+        session.add(tr)   
+    session.commit()
     
 
 
 
-# DrillMeasurements
 
+'''
+Uncomment below the inputs wanted
+'''
+# InputDatabase(Tables_list[0], db.Divers)
 
+# InputDatabase(Tables_list[1], db.WellDiver)
 
-# Wells
+# InputDatabase(Tables_list[2], db.TestsType)
 
-# WellDiver
+# InputDatabase(Tables_list[3], db.HydroTests)
 
+# InputDatabase(Tables_list[4], db.Drills)
 
-# DiverMeasurements
+# InputDatabase(Tables_list[5], db.Wells)
 
+# InputDatabase(Tables_list[6], db.VariablesDivers)
 
-session.commit()
-
-
-    
+# InputDatabase(Tables_list[7], db.DiversMeasurements)
