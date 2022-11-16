@@ -195,15 +195,15 @@ class DiversMeasurements(base):
     Date = Column (Date)
     Hour = Column(Integer)
     Variable = Column (Integer, ForeignKey('VariablesDivers.ID'))
-    Head = Column(Integer)
+    Value = Column(Integer)
     
-    def __init__ (self, ID, WellID, Date, Hour, Variable, Head):
+    def __init__ (self, ID, WellID, Date, Hour, Variable, Value):
         self.ID = ID
         self.WellID = WellID
         self.Date = Date
         self.Hour = Hour
         self.Variable = Variable
-        self.Head = Head
+        self.Value = Value
     
 
 base.metadata.create_all(engine)

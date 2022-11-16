@@ -40,7 +40,7 @@ def InputDatabase (table , func ):
                 li = [x.to_bytes(2, byteorder = 'big') for x in df[col]]
                 df[col] = li
     else:
-        df['Date'] = pd.to_datetime(df['Date'],  format = '%Y/%m/%d' )
+        df['Date'] = pd.to_datetime(df['Date'],  format = '%d/%m/%Y' )
     #input data
     for i, row in enumerate(df.iterrows()):
         values = row[1]
@@ -56,18 +56,18 @@ def InputDatabase (table , func ):
 '''
 Uncomment below the inputs wanted
 '''
-# InputDatabase(Tables_list[0], db.Divers)
+InputDatabase(Tables_list[0], db.Divers)
 
-# InputDatabase(Tables_list[1], db.WellDiver)
+InputDatabase(Tables_list[1], db.WellDiver)
 
-# InputDatabase(Tables_list[2], db.TestsType)
+InputDatabase(Tables_list[2], db.TestsType)
 
-# InputDatabase(Tables_list[3], db.HydroTests)
+InputDatabase(Tables_list[3], db.HydroTests)
 
-# InputDatabase(Tables_list[4], db.Drills)
+InputDatabase(Tables_list[4], db.Drills)
 
-# InputDatabase(Tables_list[5], db.Wells)
+InputDatabase(Tables_list[5], db.Wells)
 
-# InputDatabase(Tables_list[6], db.VariablesDivers)
+InputDatabase(Tables_list[6], db.VariablesDivers)
 
-# InputDatabase(Tables_list[7], db.DiversMeasurements)
+InputDatabase(Tables_list[7], db.DiversMeasurements)
