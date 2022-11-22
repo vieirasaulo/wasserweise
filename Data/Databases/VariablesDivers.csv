@@ -1,8 +1,11 @@
-ID,Name,Description
-0,Water Column [m],hlevel [m] - Water Column above Solinc divers
-1,Hydraulic Head [m],Insert description
-2,pH,Insert description
-3,EC [mS/cm],Insert description
-4,EC25 [mS/cm],Insert description
-5,LDO [mg/L],Insert description
-6,Temperature [Â°C],Insert description
+ID,Name,Description,,,
+0,head,Hydraulic Head [m],,,
+1,t,Temperature [°C],,,
+2,t_intern,Temperature Intern [°C],,,
+3,ec_25,EC [mS/cm],,,
+4,ec,EC25 [mS/cm],,,
+5,v_batt,[V],,,
+6,ph,pH,,,
+7,ldo,LDO [mg/L],,,
+8,h,Water Column [m],,,
+,,,,,

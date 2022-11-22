@@ -1,0 +1,107 @@
+[33mcommit ff8017a5eabae478575f33175f4cf2f610feb3fc[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Mon Nov 21 11:35:56 2022 +0100
+
+    querying less filters - contour+quiver
+    
+    checkpoints deleted
+
+[33mcommit deeda252f76cabc613938b2d8aaa0b1a1cf3ecd6[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Sat Nov 19 16:24:12 2022 +0100
+
+    API tested, database table added, querying functions and plotting
+
+[33mcommit bda715ea19d7847612e2b6f1b75b92d5c7ead623[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Wed Nov 16 22:59:49 2022 +0100
+
+    querying functions added and tested
+
+[33mcommit 078a63ad2c2d41624b6f101fdae1975d2c7eb614[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Tue Nov 15 19:52:09 2022 +0100
+
+    database filled and querying developed
+    
+    hydrogeological data present
+
+[33mcommit 83603a5b1467ec9289b5e7f59db8e84c92bf59f8[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Sun Nov 13 16:23:10 2022 +0100
+
+    py file for database creation, input and query added
+    
+    database excel file and schema added
+
+[33mcommit c894708d2d70246a31e5a29c1bc9a37e0e1d12d6[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Sun Nov 13 16:19:42 2022 +0100
+
+    Real Time Monitoring Tool started being created
+
+[33mcommit 9fc9219fc6bc47b3e42e07890eaa87c3d34b84e9[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Wed Nov 9 19:48:42 2022 +0100
+
+    WellID manually updated with Nico / GWL with heads script
+
+[33mcommit ab42ba9eacc371af1bb54e9a523b7658ad49f198[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Fri Oct 28 19:22:13 2022 +0200
+
+    full database of gwl added
+    
+    we still need to check it, interpolate or not missing dates
+
+[33mcommit b9cd2706aeab3624becbb997c79a8e00f304638a[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Fri Oct 28 19:20:12 2022 +0200
+
+    full database of gwl added
+    
+    we still need to check it, interpolate or not missing dates
+
+[33mcommit 50d4a4bc2db1af7118b5fb2ca2cd6252fc3c5e82[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Fri Oct 28 19:14:00 2022 +0200
+
+    full database of gwl added
+    
+    we still need to check it, interpolate or not missing dates
+
+[33mcommit 257e87e261aec8e4ff1763f093ca4630dbb04070[m
+Merge: fe20abf 0cb3077
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Fri Oct 28 18:27:52 2022 +0200
+
+    Merge branch 'master' of https://github.com/SauloVSFh/PirnaStudyCase
+
+[33mcommit fe20abfbd483440f2e2d90e99fcd88af7c150f79[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Fri Oct 28 18:27:06 2022 +0200
+
+    files added
+
+[33mcommit 0cb30775d3216389eadb58645ed451c75dbab6e6[m
+Merge: 7485751 a52afbf
+Author: SauloVSFh <52264357+SauloVSFh@users.noreply.github.com>
+Date:   Fri Oct 28 18:24:58 2022 +0200
+
+    Merge pull request #1 from SauloVSFh/master
+    
+    first files added
+
+[33mcommit a52afbf7ac74cc371a8a877e75344a2f6f2ad2f3[m
+Author: Saulo Silva Filho <saulo.vsfh@gmail.com>
+Date:   Fri Oct 28 18:18:27 2022 +0200
+
+    first files added
+    
+    database and preliminary script are made
+
+[33mcommit 7485751b79fbdaf0b0185a531bf6a70e12fd5d87[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: SauloVSFh <52264357+SauloVSFh@users.noreply.github.com>
+Date:   Fri Oct 28 17:47:21 2022 +0200
+
+    Initial commit
