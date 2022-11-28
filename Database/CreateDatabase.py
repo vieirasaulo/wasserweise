@@ -1,6 +1,6 @@
 import sqlalchemy as sqla
 from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, String, Integer, Float, LargeBinary, Date, ForeignKey
+from sqlalchemy import Table, Column, String, Integer, Float, LargeBinary, Date, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 import pandas as pd
@@ -180,7 +180,7 @@ class WellDiver(base):
     
 class DiversMeasurements(base):
     __tablename__ = 'DiversMeasurements'
-    #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
+    # connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
     
@@ -192,23 +192,21 @@ class DiversMeasurements(base):
     '''
         
     WellID = Column(Integer, ForeignKey('Wells.ID'))
-    Date = Column (Date)
-    Hour = Column(Integer)
+    TimeStamp = Column (Integer)
     Variable = Column (Integer, ForeignKey('VariablesDivers.ID'))
     Value = Column(Integer)
     
-    def __init__ (self, ID, WellID, Date, Hour, Variable, Value):
+    def __init__ (self, ID, WellID, TimeStamp, Variable, Value):
         self.ID = ID
         self.WellID = WellID
-        self.Date = Date
-        self.Hour = Hour
+        self.TimeStamp = TimeStamp 
         self.Variable = Variable
         self.Value = Value
 
 #Table to know what each diver is monitoring
 class DiverReads(base):
     __tablename__ = 'DiverReads'
-    #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
+    # connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
     VariablesDiversID = Column(Integer, ForeignKey('VariablesDivers.ID'))

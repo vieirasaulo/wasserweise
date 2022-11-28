@@ -1,3 +1,4 @@
+import os
 import re
 import CreateDatabase as db
 import sqlalchemy as sqla
@@ -30,11 +31,11 @@ class TimeSeries:
         if filterVariable in self.Runs:
             pass #gain computer time
             self.DataFrame = self.Runs[filterVariable]
-            print('\n\n ******************** DataFrame already generated **********************\n\n\n')
+            # print('\n\n ******************** DataFrame already generated **********************\n\n\n')
         else:                    
             query = '''
             SELECT 
-                DiversMeasurements.ID, DiversMeasurements.Date, DiversMeasurements.Variable, DiversMeasurements.Value,
+                DiversMeasurements.ID, DiversMeasurements.TimeStamp, DiversMeasurements.Variable, DiversMeasurements.Value,
                 Wells.ID, Wells.Name, Wells.DrillID,
                 Drills.ID, Drills.E, Drills.N
             FROM 
@@ -50,18 +51,17 @@ class TimeSeries:
             DataFrame = pd.read_sql(query, con = connection)
             DataFrame = DataFrame.iloc[:,1:]
             DataFrame = DataFrame.loc[:, ~DataFrame.columns.duplicated()]
-            DataFrame.Date = pd.to_datetime(DataFrame.Date)
-            ts_df.Date = pd.to_datetime(ts_df.Date)
+            DataFrame.TimeStamp = pd.to_datetime(DataFrame.TimeStamp)
             end_time = time.perf_counter()
             #store run in class dictionary
             self.Runs [filterVariable] = DataFrame            
             self.DataFrame = DataFrame
             self.RunTime = end_time - start_time
 
-class PotentiometricMap:
+class Isolines:
     #store dataframes here
     Runs = {}
-    def __init__ (self, database_fn, filterVariable, Year, Month, Day, FilterHour) :
+    def __init__ (self, database_fn, Variable, Year, Month, Day, Hour) :
     
         engine = create_engine("sqlite:///{}".format(database_fn), echo = False) #False to not show the output
         connection = engine.connect()
@@ -70,21 +70,24 @@ class PotentiometricMap:
         session = Session()
         start_time = time.perf_counter()
         
-        date = pd.to_datetime(f'{Year}-{Month}-{Day}').date()
-        year, day = str(Year), str(Month)
-        if Month<10:
-            Month = f'0{str(Month)}'
+        if Hour <10:
+            datetime = pd.to_datetime(f'{Year}-{Month}-{Day} 0{Hour}')
+        else:
+            datetime = pd.to_datetime(f'{Year}-{Month}-{Day} {Hour}')
+        l_ts = pd.to_datetime(f'{Year}-{Month}-{Day} {Hour-1}:30').value
+        u_ts = pd.to_datetime(f'{Year}-{Month}-{Day} {Hour}:30').value
         
+
         #generating Key for the class dictionary
-        Runs_key = f'{date}-{FilterHour}-{filterVariable}'
+        Runs_key = f'{datetime}-{Variable}'
         
         
         if Runs_key not in self.Runs:
             query = f'''
             SELECT 
-                DiversMeasurements.Date, DiversMeasurements.Hour, DiversMeasurements.Variable, DiversMeasurements.Value,
-                Wells.ID, Wells.Name, Wells.DrillID, Drills.ID, Drills.E, Drills.N,
-                VariablesDivers.ID, VariablesDivers.Name
+            	DiversMeasurements.WellID, DiversMeasurements.TimeStamp, DiversMeasurements.Variable, DiversMeasurements.Value,
+            	Wells.ID, Wells.Name, Wells.DrillID, Drills.ID, Drills.E, Drills.N,
+            	VariablesDivers.ID, VariablesDivers.Name
             FROM 
                 DiversMeasurements
             JOIN
@@ -94,17 +97,9 @@ class PotentiometricMap:
             JOIN	
                 VariablesDivers ON 	DiversMeasurements.Variable = VariablesDivers.ID
             WHERE
-            	Variable = {filterVariable} and Date = '{Year}-{Month}-{Day}' and Hour = {FilterHour}
+            	Variable = {Variable} AND TimeStamp BETWEEN {l_ts} AND {u_ts}
             '''
             
-            #parsing query to get col names
-#             q = query.split('\n')
-#             l1 = q[2].split(',')
-#             l2 = q[3].split(',')
-#             l = l1 + l2
-
-#             cols = [re.sub("[\t ]", '', i) for i in l if '.' in i]
-#             cols = [i.split('.')[1] for i in cols]
             
             DataFrame = pd.read_sql(query, con = connection)
         
@@ -116,51 +111,34 @@ class PotentiometricMap:
 
             #saving constant variables to store it as class attribute
 
-            VariableName = DataFrame.VariableName.unique()[0]
-            DataFrame['Date'] = pd.to_datetime(DataFrame.Date)
+            # VariableName = DataFrame.VariableName.unique()[0]
             #dropping constant variable
-            DataFrame = DataFrame.drop(['VariableName', 'Hour', 'Date', 'Variable'], axis = 1) 
+            # DataFrame = DataFrame.drop(['VariableName', 'TimeStamp', 'Variable'], axis = 1) 
             
-#             DataFrame.columns = cols
-#             selection = ['ID', 'Name', 'Date', 'Hour', 'Variable', 'Value', 'E', 'N']
-                                   
-#             DataFrame = DataFrame[selection]
             
-#             DataFrame.columns = ['ID', 'DrillID', 'Name', 'Date', 'Hour', 'Variable', 'Value', 'E', 'N']
-            
-#             DataFrame.drop(DataFrame.iloc[:,1].name, axis = 1, inplace = True)
-            
-            print(query)
-            
-            Runs_key = f'{date}-{FilterHour}-{filterVariable}'
+            # print(query)
             end_time = time.perf_counter()
             self.RunTime = end_time - start_time
             self.DataFrame = DataFrame
-            self.Date = date
-            self.Hour = FilterHour
-            self.VariableID = filterVariable
-            self.VariableName = VariableName
+            self.datetime = datetime
+            self.VariableID = Variable
+            # self.VariableName = VariableName
             #adding run to class attribute
             self.Runs [Runs_key] = {'DataFrame' : DataFrame,
-                                    'Date' : date,
-                                    'Hour' : FilterHour,
-                                    'VariableID' : filterVariable,
-                                    'VariableName' : VariableName} #store in class variable
-            
+                                    'Datetime' : datetime,
+                                    'VariableID' : Variable} #store in class variable
+            # print(self.Runs)
             
         #conditional to retrieve dataframe from class attribute
         #gain computer time
         else:
-            Runs_key = f'{date}-{FilterHour}-{filterVariable}' #retrieving key
             #getting object's attributes
             self.DataFrame = self.Runs[Runs_key]['DataFrame']
-            self.Date = self.Runs[Runs_key]['Date']
-            self.Hour = self.Runs[Runs_key]['Hour']
+            self.Datetime = self.Runs[Runs_key]['Datetime']
             self.VariableID = self.Runs[Runs_key]['VariableID']
-            self.VariableName = self.Runs[Runs_key]['VariableName']
                 
             
-            print('\n\n ******************** DataFrame already generated **********************\n\n\n')
+            # print('\n\n ******************** DataFrame already generated **********************\n\n\n')
            
 
 
@@ -179,7 +157,7 @@ class HydroProfile:
         if 'DataFrame' in self.Runs:
             pass #gain computer time
             self.DataFrame = self.Runs['DataFrame']
-            print('\n\n ******************** DataFrame already generated **********************\n\n\n')
+            # print('\n\n ******************** DataFrame already generated **********************\n\n\n')
         else:                    
             query = f'''
             SELECT
@@ -215,8 +193,109 @@ class HydroProfile:
             DataFrame = DataFrame[selection]
             DataFrame.columns = [i.split('_')[1] for i in selection]
             
-            print(query)
+            # print(query)
             end_time = time.perf_counter()
             self.RunTime = end_time - start_time
             self.DataFrame = DataFrame
             self.Runs ['DataFrame'] = DataFrame #store in class variable
+
+
+class IsolinesLong:
+    #store dataframes here
+    Runs = {}
+    def __init__ (self, database_fn, Variable) :
+    
+        engine = create_engine("sqlite:///{}".format(database_fn), echo = False) #False to not show the output
+        connection = engine.connect()
+        base = declarative_base()
+        Session = sessionmaker(bind = db.engine)
+        session = Session()
+        start_time = time.perf_counter()
+
+        #generating Key for the class dictionary
+        Runs_key = Variable
+        
+        if Runs_key not in self.Runs:
+            query = f'''
+            SELECT 
+            	DiversMeasurements.WellID, DiversMeasurements.TimeStamp, DiversMeasurements.Variable, DiversMeasurements.Value,
+            	Wells.ID, Wells.Name, Wells.DrillID, Drills.ID, Drills.E, Drills.N,
+            	VariablesDivers.ID, VariablesDivers.Name
+            FROM 
+                DiversMeasurements
+            JOIN
+                Wells ON DiversMeasurements.WellID = Wells.ID
+            JOIN
+                Drills ON Wells.DrillID = Drills.ID	
+            JOIN	
+                VariablesDivers ON 	DiversMeasurements.Variable = VariablesDivers.ID
+            WHERE
+            	Variable = {Variable}
+            '''
+            
+            DataFrame = pd.read_sql(query, con = connection)
+        
+            cols = list(DataFrame.columns)
+            cols[5] =  'WellName'
+            cols[-1] = 'VariableName'
+            DataFrame.columns = cols
+            DataFrame = DataFrame.loc [:, ~DataFrame.columns.duplicated()].drop('DrillID', axis = 1)
+
+            # print(query)
+            end_time = time.perf_counter()
+            self.RunTime = end_time - start_time
+            self.DataFrame = DataFrame
+            #adding run to class attribute
+            self.Runs [Runs_key] = {'DataFrame' : DataFrame} #store in class variable
+            # print(self.Runs)
+            
+        #conditional to retrieve dataframe from class attribute
+        #gain computer time
+        else:
+            #getting object's attributes
+            self.DataFrame = self.Runs[Runs_key]['DataFrame']       
+                
+            
+            # print('\n\n ******************** DataFrame already generated **********************\n\n\n')
+
+            
+def ConnectEngine (database_fn):
+        engine = create_engine("sqlite:///{}".format(database_fn), echo = False) #False to not show the output
+        connection = engine.connect()
+        base = declarative_base()
+        Session = sessionmaker(bind = db.engine)
+        session = Session()
+        start_time = time.perf_counter()
+        return connection
+
+        
+def GetTable (database_fn, TableName):
+    connection = ConnectEngine(database_fn)
+    query = f'''SELECT * FROM {TableName}'''
+    DataFrame = pd.read_sql(query, con = connection)
+    
+    return DataFrame
+
+
+#NOT READY
+def GetBoundDates (database_fn, TableName) :
+    query_max = f'SELECT MAX (TimeStamp) AS max_dates from {TableName}'
+    query_min = f'SELECT MIN (TimeStamp) AS max_dates from {TableName}'
+    
+    return max, min
+        
+    
+def GetWellData (database_fn):
+    connection = ConnectEngine(database_fn)
+    query = f'''
+    SELECT 
+        Wells.ID, Wells.Name, Wells.DrillID,
+        Drills.ID, Drills.E, Drills.N
+    FROM 
+        Wells
+    JOIN
+        Drills ON Wells.DrillID = Drills.ID
+    '''
+    wells_df = pd.read_sql(query, con = connection)
+    wells_df = wells_df.drop('ID', axis = 1)
+    return wells_df

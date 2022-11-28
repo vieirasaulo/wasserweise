@@ -16,7 +16,7 @@ session = Session()
 path = 'D:\\Repos\\PirnaCaseStudy\\Data\\Databases'
 Tables_list = ['Divers', 'WellDiver', 'TestsType', 
                 'HydroTests', 'Drills', 'Wells', 
-                'VariablesDivers' , 'DiversMeasurements']
+                'VariablesDivers' , 'DiversMeasurements1']
 
 os.chdir(path)
 
@@ -30,6 +30,7 @@ generate .csv files
 
 def InputDatabase (table , func ):
     df = pd.read_csv(f'{table}.csv') #iterator here #need to convert str to var
+    # df = df.sample(n=10)
     columns = df.columns
     
     #modify the table. Convert interger to bites in binary columns
@@ -37,10 +38,12 @@ def InputDatabase (table , func ):
         for col in columns:
             unique = df[col].unique()
             if np.array_equal(unique, unique.astype(bool)): #True for binary arrays
+                if col == 'Variable':
+                    continue #don't want binary here
                 li = [x.to_bytes(2, byteorder = 'big') for x in df[col]]
                 df[col] = li
     else:
-        df['Date'] = pd.to_datetime(df['Date'],  format = '%d/%m/%Y' )
+        df['TimeStamp'] = pd.to_datetime(df['Time'])
     #input data
     for i, row in enumerate(df.iterrows()):
         values = row[1]
@@ -56,18 +59,18 @@ def InputDatabase (table , func ):
 '''
 Uncomment below the inputs wanted
 '''
-InputDatabase(Tables_list[0], db.Divers)
+# InputDatabase(Tables_list[0], db.Divers)
 
-InputDatabase(Tables_list[1], db.WellDiver)
+# InputDatabase(Tables_list[1], db.WellDiver)
 
-InputDatabase(Tables_list[2], db.TestsType)
+# InputDatabase(Tables_list[2], db.TestsType)
 
-InputDatabase(Tables_list[3], db.HydroTests)
+# InputDatabase(Tables_list[3], db.HydroTests)
 
-InputDatabase(Tables_list[4], db.Drills)
+# InputDatabase(Tables_list[4], db.Drills)
 
-InputDatabase(Tables_list[5], db.Wells)
+# InputDatabase(Tables_list[5], db.Wells)
 
-InputDatabase(Tables_list[6], db.VariablesDivers)
+# InputDatabase(Tables_list[6], db.VariablesDivers)
 
-InputDatabase(Tables_list[7], db.DiversMeasurements)
+# InputDatabase(Tables_list[7], db.DiversMeasurements)

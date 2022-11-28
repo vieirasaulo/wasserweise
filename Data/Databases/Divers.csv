@@ -1,19 +1,21 @@
-ID,Name,Company,IOT,Active
-0,S01,Solinst,0,1
-1,S02,Solinst,0,1
-2,S03,Solinst,0,1
-3,S04,Solinst,0,1
-4,S05,Solinst,0,1
-5,S06,Solinst,0,1
-6,,UIT,1,1
-7,,Solinst,0,1
-8,,Solinst,0,1
-9,,Solinst,0,1
-10,,UIT,1,1
-11,,UIT,1,1
-12,Deu1_I-2,UIT,1,1
-13,Deu1_I-3,UIT,1,1
-14,Deu1_I-4,UIT,1,1
-15,Deu1_I-5,UIT,1,0
-16,Deu1_I-6,UIT,1,0
-17,,UIT,1,1
+ID,LongID,Project,Name,Company,Depth,IOT,Active,Functioning?,Variables,OBS
+0,S01,PirnaSol,S01,Solinst,,0,1,1,"['t', 'h_level']",
+1,S02,PirnaSol,S02,Solinst,,0,0,0,"['t', 'h_level']",
+2,S03,PirnaSol,S03,Solinst,,0,1,1,"['t', 'h_level']",
+3,S04,PirnaSol,S04,Solinst,,0,1,1,"['t', 'h_level']",
+4,S05,PirnaSol,S05,Solinst,,0,1,1,"['t', 'h_level']",
+5,S06,PirnaSol,S06,Solinst,,0,1,1,"['t', 'h_level']",
+6,S07,PirnaSol,S07,Solinst,,0,1,0,"['t', 'h_level']",Installed in G15. No data since 05-02-2021
+7,S08,PirnaSol,S08,Solinst,,0,1,1,"['t', 'h_level']",
+8,S09,PirnaSol,S09,Solinst,,0,1,1,"['t', 'h_level']",
+9,S10,PirnaSol,S10,Solinst,,0,0,0,"['t', 'h_level']",
+10,S11,PirnaSol,S11,Solinst,,0,1,1,"['t', 'h_level']",
+11,92f5a88d-e079-47c3-a983-26db8c317a5e,DEU1,I-2,UIT,12.3,1,1,1,"['ph', 'h_level', 'ldo', 'h', 'v_batt', 'ec', 't', 'ec_25', 't_intern']",
+12,a0b8f4e7-ac0c-4a50-aec5-e96704089732,DEU1,I-3,UIT,12.3,1,1,1,"['t', 'ec', 'ec_25', 'h', 'h_level', 'ldo', 'ph', 't_intern', 'v_batt']",
+13,a02ac9ac-784e-4be3-81cb-30e89541310a,DEU1,I-5,UIT,12.3,1,1,1,"['v_batt', 't_intern', 't', 'ph', 'ldo', 'h_level', 'h', 'ec_25', 'ec']",
+14,2c290fe2-9518-4ce4-8359-805b0e262c78,DEU1,I-6,UIT,12.3,1,1,0,"['h', 'ec_25', 'v_batt', 't_intern', 't', 'ph', 'ldo', 'h_level', 'ec']",Antena is not transmitting the data
+15,b4b39661-7033-4c04-a51a-36cb36507fc8,DEU1,123,UIT,7.98,1,1,1,"['t_intern', 'ec_25', 'ec', 'h_level', 'v_batt', 't', 'h']",123 currently installed at a different depth (Resistance due to curved well pipe)
+16,548843f7-f354-4f59-a2e3-d51a444d42e3,DEU1,124,UIT,10.8,1,0,1,"['ec_25', 'h', 'h_level', 't', 't_intern', 'v_batt', 'ec']",
+17,4ff6932b-722d-42c2-b6e2-0124dceaf934,DEU1,125,UIT,10.8,1,1,1,"['v_batt', 'ec', 'ec_25', 'h', 'h_level', 't', 't_intern']",last update in 16/10/22
+18,99911176-6e05-4cc6-b01d-86b33010b2bd,DEU1,126,UIT,10.8,1,1,1,"['h', 'h_level', 't', 't_intern', 'v_batt', 'ec', 'ec_25']",Only read Vbatt and Tintern
+19,d79989b8-bde9-4744-bc39-1de03562284c,DEU1,127,UIT,10.8,1,1,1,"['ec', 'v_batt', 't_intern', 't', 'h_level', 'h', 'ec_25']",

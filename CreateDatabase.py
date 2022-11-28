@@ -8,7 +8,6 @@ import pandas as pd
 database_fn = 'Database.db'
 path = 'D:\\Repos\\PirnaCaseStudy\\Database'
 database_path = path + '\\' + database_fn
-
 engine = create_engine("sqlite:///{}".format(database_fn), echo = True)
 connection = engine.connect()
 base = declarative_base()
@@ -19,13 +18,13 @@ class TestsType (base):
     #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     ID = Column(Integer, primary_key = True)
     Name = Column(String(32), nullable=False) #Type of test
-    Variable = Column(String(32)) #Type of test
+    ShortName = Column(String(32)) #Type of test
     Unit = Column(String(32)) #Type of test
     
-    def __init__ (self, ID, Name, Variable, Unit):
+    def __init__ (self, ID, Name, ShortName, Unit):
         self.ID = ID
         self.Name  = Name 
-        self.Variable = Variable
+        self.ShortName = ShortName
         self.Unit = Unit
 
 class Divers(base):
@@ -46,8 +45,8 @@ class Divers(base):
         self.Active = Active
         
     
-class VariablesDivers(base):
-    __tablename__ = 'VariablesDivers'
+class Variables(base):
+    __tablename__ = 'Variables'
     #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
@@ -64,92 +63,71 @@ class VariablesDivers(base):
         self.Description = Description
 
 
-class Drills (base):
-    __tablename__ = 'Drills'
+class Points (base):
+    __tablename__ = 'Points'
     #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
     Name = Column(String(32), nullable=False)
+    Type = Column(String(32), nullable=False)
     DescriptionData = Column(LargeBinary)
-    Well = Column(LargeBinary)
+    MonitoringPoint = Column(LargeBinary)
     DrillingTest = Column(LargeBinary) #comes from measurements ID
     Depth = Column(Float)
     E = Column (Float)
     N = Column (Float)
     
-    #relationship
-    # DrillTests = relationship("DrillingTests", back_populates ="Test") #Dad: one-to-many relationship
-
-    def __init__ (self, ID, Name, DescriptionData, Well, DrillingTest, Depth, E, N):
+    def __init__ (self, ID, Name, Type, DescriptionData, MonitoringPoint, DrillingTest, Depth, E, N):
         self.ID = ID
         self.Name = Name
         self.DescriptionData = DescriptionData
-        self.Well = Well
+        self.MonitoringPoint = MonitoringPoint
         self.DrillingTest = DrillingTest
         self.Depth = Depth
         self.E = E
         self.N = N 
 
-#table to register the drill measurements 
-#there is a connection with Drills
-# class DrillingTests (base):
-#     __tablename__ = 'DrillingTests'
-#     #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
-    
-#     DrillID = Column(Integer, ForeignKey("Drills.ID")) #connects to drill 
-#     ID = Column(Integer, primary_key = True)  
-#     TypeID = Column(Integer, ForeignKey("TestsType.ID")) #connects to TestType - Dad
-#     Observation = Column (String(64))    
-    
-#     #relationship
-#     # Test = relationship('Drills', back_populates  = 'DrillTests' ) # Child: one-to-many 
-    
-#     def __init__ (self, ID, DrillID, TypeID, Observation):
-#         self.ID = ID
-#         self.DrillID = DrillID
-#         self.TypeID = TypeID
-#         self.Observation = Observation   
-        
-class HydroTests (base):
-    __tablename__ = 'HydroTests'
+class DrillingTests (base):
+    __tablename__ = 'DrillingTests'
     #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)  
-    DrillID = Column(Integer, ForeignKey("Drills.ID")) #connects to drill 
+    PointID = Column(Integer, ForeignKey("Points.ID")) #connects to Points 
     Depth = Column (Integer, nullable = False)
     TestTypeID = Column(Integer, ForeignKey("TestsType.ID")) #connects to TestType - Dad
     Value = Column (Float)    
-    
-    #relationship
-    # Test = relationship('Drills', back_populates  = 'DrillTests' ) # Child: one-to-many 
-    
-    def __init__ (self, ID, DrillID, Depth, TestTypeID, Value):
+        
+    def __init__ (self, ID, PointID, Depth, TestTypeID, Value):
         self.ID = ID
-        self.DrillID = DrillID
+        self.PointID = PointID
         self.Depth = Depth
         self.TestTypeID = TestTypeID
         self.Value = Value
         
-# It is connected to Drills also 
+# It is connected to Points also 
 #coordinates can be retrieved based on this connection
-class Wells (base):
-    __tablename__ = 'Wells'
+class MonitoringPoints (base):
+    __tablename__ = 'MonitoringPoints'
     #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
     Name = Column(String(32), nullable=False)
-    DrillID = Column(Integer, ForeignKey('Drills.ID')) #drill that is connected to this well
-    CaseHeight = Column(Float)
+    PointID = Column(Integer, ForeignKey('Points.ID')) #point that is connected to a measuring point
+    Type = Column(String(32), nullable=False)
+    ReferenceAltitude = Column(Float)
+    TypeOfAltitude = Column(String(32))
     Diameter = Column(String(32), nullable=False)
     FilterTop = Column (Float)
     FilterBase = Column (Float)
     Depth = Column (Float)
     
-    def __init__ (self, ID, Name, DrillID, CaseHeight, Diameter, FilterTop, FilterBase, Depth):
+    def __init__ (self, ID, Name, PointID, Type, ReferenceAltitude, TypeOfAltitude , Diameter, FilterTop, FilterBase, Depth):
         self.ID = ID
         self.Name = Name
-        self.DrillID = DrillID
-        self.CaseHeight = CaseHeight
+        self.PointID = PointID
+        self.Type = Type
+        self.ReferenceAltitude = ReferenceAltitude
+        self.TypeOfAltitude = TypeOfAltitude
         self.Diameter = Diameter
         self.FilterTop = FilterTop
         self.FilterBase = FilterBase
@@ -158,8 +136,6 @@ class Wells (base):
 
 # Insert here possible table for welltests
 
-        
-
 #relationship between well and diver    
 #two foreign keys
 class WellDiver(base):
@@ -167,71 +143,49 @@ class WellDiver(base):
     #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
-    WellID = Column(Integer, ForeignKey('Wells.ID'))
-    DiverID = Column(String(32), ForeignKey('Divers.ID'))
+    MonitoringPointID = Column(Integer, ForeignKey('MonitoringPoints.ID'))
+    MonitoringPointName = Column(String(32))
+    DiverID = Column(Integer, ForeignKey('Divers.ID'))
     DiverDepth = Column (Integer)
     
-    def __init__ (self, ID, WellID, DiverID, DiverDepth):
+    def __init__ (self, ID, MonitoringPointID, MonitoringPointName, DiverID, DiverDepth):
         self.ID = ID
-        self.WellID = WellID
+        self.MonitoringPointID = MonitoringPointID
+        self.MonitoringPointName = MonitoringPointName
         self.DiverID = DiverID
         self.DiverDepth = DiverDepth
 
     
-class DiversMeasurements(base):
-    __tablename__ = 'DiversMeasurements'
+class PointsMeasurements(base):
+    __tablename__ = 'PointsMeasurements'
     #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
     
     ID = Column(Integer, primary_key = True)
     
     '''
-    Values from divers will be read but they have to be transferred to wells 
+    Values from divers will be read but they have to be transferred to MonitoringPoints 
     before passing them into the database.
     
-    The connection with the well will be used to connect with the drill and retrieve the coordinates
+    The connection with the measuring point will be used to connect with the point and retrieve the coordinates
     '''
         
-    WellID = Column(Integer, ForeignKey('Wells.ID'))
+    MonitoringPointID = Column(Integer, ForeignKey('MonitoringPoints.ID'))
     Date = Column (Date)
     Hour = Column(Integer)
-    Variable = Column (Integer, ForeignKey('VariablesDivers.ID'))
+    Variable = Column (Integer, ForeignKey('Variables.ID'))
     Value = Column(Integer)
     
-    def __init__ (self, ID, WellID, Date, Hour, Variable, Value):
+    def __init__ (self, ID, MonitoringPointID, Date, Hour, Variable, Value):
         self.ID = ID
-        self.WellID = WellID
+        self.MonitoringPointID = MonitoringPointID
         self.Date = Date
         self.Hour = Hour
         self.Variable = Variable
         self.Value = Value
-
-#Table to know what each diver is monitoring
-class DiverReads(base):
-    __tablename__ = 'DiverReads'
-    #connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))
-    
-    ID = Column(Integer, primary_key = True)
-    VariablesDiversID = Column(Integer, ForeignKey('VariablesDivers.ID'))
-    DiverID = Column (Integer, ForeignKey('Divers.ID'))
-    
-    def __init__ (self, ID, VariablesDiversID, DiverID):
-        self.ID = ID
-        self.VariablesDiversID = VariablesDiversID
-        self.DiverID = DiverID
-
 
 '''
 create the database
 '''
 base.metadata.create_all(engine)
 
-
-
-#retrieving Table as dataframe
-def Access_df (table):
-    Query = sqla.select([table]) 
-    ResultProxy = connection.execute(Query)
-    ResultSet = ResultProxy.fetchall()
-    df = pd.DataFrame(ResultSet)
-    return df
 
