@@ -1,0 +1,9 @@
+ID,Name,Description
+0,h_level,Hydraulic Head [m]
+1,t,Temperature [C]
+2,ec_25,EC25 [mS/cm]
+3,ec,EC [mS/cm]
+4,v_batt,[V]
+5,ph,pH
+6,ldo,LDO [mg/L]
+7,Rh,River head [m]
