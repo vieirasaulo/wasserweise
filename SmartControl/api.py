@@ -7,8 +7,8 @@ import sqlalchemy
 import pandas as pd
 from datetime import datetime
 import numpy as np
-import utils as u
-import queries as q
+import SmartControl.utils as utils
+import SmartControl.queries as queries
 
 
 
@@ -53,7 +53,7 @@ def GetDivers (connection : sqlalchemy.engine.base.Connection):
     return SensorsAPI_df, Sensors_df
 
 
-class Inowas (q.Get):
+class Inowas (queries.Get):
     
     def __init__(self, Get_, sensor, parameter : str, sts : int, ets : int):
         # Long url, short request -> one sensor one parameter
@@ -103,7 +103,7 @@ class Inowas (q.Get):
 
 
 
-class PegelAlarm (q.Get):
+class PegelAlarm (queries.Get):
 
     def __init__ (self, Get_):
         
@@ -117,8 +117,8 @@ class PegelAlarm (q.Get):
         
         t0, ts0 = Get_.APIDate (MonitoringPointID = GageID)
         
-        t0 = u.TimeToString(t0)
-        t1 = u.TimeToString(pd.to_datetime(datetime.now()).round('s'))
+        t0 = utils.TimeToString(t0)
+        t1 = utils.TimeToString(pd.to_datetime(datetime.now()).round('s'))
         
         parameter = f'&loadStartDate={t0}%2B0200&loadEndDate={t1}%2B0200'
         url = f'https://api.pegelalarm.at/api/station/1.0/a/saulo_filho_tudresden/height/501040-de/history?granularity=hour&{parameter}'
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     database_fn = 'Database.db'
     database_fn = path + '\\' + database_fn
 
-    Get = q.Get(database_fn)
+    Get = queries.Get(database_fn)
     
     # r = PegelAlarm(Get)
     # r.Request()

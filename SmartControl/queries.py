@@ -1,4 +1,3 @@
-
 import time
 from datetime import timedelta
 import pandas as pd
@@ -6,7 +5,7 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import CreateDatabase as db
+import SmartControl.CreateDatabase as CreateDatabase
 
 class Get:
     def __init__ (self, database_fn : str):
@@ -31,12 +30,21 @@ class Get:
 
         engine = create_engine("sqlite:///{}".format(database_fn), echo = False) #False to not show the output
         connection = engine.connect()
-        Session = sessionmaker(bind = db.engine)
+        Session = sessionmaker(bind = CreateDatabase.engine)
         session = Session()
           
         self.engine = engine
         self.connection = connection
         self.session = session
+        
+        '''
+        store dataframes here
+        '''
+        
+        self.LongTimeSeries_Runs = {}      
+        self.ShortTimeSeries_Runs = {}      
+        self.Isolines_Runs = {}      
+        self.HydroProfile_Runs = {}      
 
         
     
@@ -96,6 +104,44 @@ class Get:
         
         return first_t, first_ts
     
+    def StartEndDate ( self, limit = 50):
+        '''    
+        Function to get the start and end date of the database
+        
+        Parameters
+        ----------
+        limit: int , optional
+            the number of entries that will be skiped
+            this will help to avoid missing values from divers when querying isolines
+        
+        Returns
+        -------
+        t0: pandas._libs.tslibs.timestamps.Timestamp
+            starting date
+        t1: int
+           ending date
+        '''
+        
+        t0_q = '''SELECT 
+                    TimeStamp FROM PointsMeasurements 
+                ORDER BY
+                    TimeStamp ASC LIMIT 1'''
+        
+        t1_q = f'''SELECT VariableID, TimeStamp FROM PointsMeasurements 
+                WHERE
+                    VariableID = 0
+                ORDER BY
+                    TimeStamp DESC LIMIT {limit}'''
+        
+        t0 = pd.read_sql(t0_q, con = self.connection).values[0][0]
+        t1 = pd.read_sql(t1_q, con = self.connection).values[limit-1][1]
+        
+        t0 = pd.to_datetime(t0*1e9)
+        t1 = pd.to_datetime(t1*1e9)
+        
+        return t0, t1    
+    
+    
     def UpdateID  (self):
         '''
         
@@ -115,7 +161,21 @@ class Get:
         update_id = pd.read_sql(last_id_query, con = self.connection).values[0][0] + 1
         return update_id    
     
-    def MonitoringPointData (self, GageData = None):
+    def MonitoringPointData (self, GageData : bool = None):
+        '''
+        
+
+        Parameters
+        ----------
+        GageData : bool, optional
+            DESCRIPTION. The default is None.
+            If True, it saves as a class attribute only the Gage Data
+
+        Returns
+        -------
+        MonitoringPointData_df : pandas.core.frame.DataFrame
+            Dataframe containing data concerning all the Monitoring Points.
+        '''
     
     
         query = '''
@@ -132,20 +192,21 @@ class Get:
         
         # df = df.iloc[:]
         
-        if GageData is not None:
-            df = df [ df.Type == 'River Gage'].reset_index (drop = 1)
-            
-        
+        if GageData:
+            self.MonitoringPointData_df = df
+            gage_df = df [ df.Type == 'River Gage'].reset_index (drop = 1)
+            self.GageData = gage_df
+        else: 
+            self.MonitoringPointData_df = df
         return df
     
-    def DiverData (self, sensor : str):
+    def DiverData (self, SensorName : str):
         '''
+        Get class method 
     
         Parameters
         ----------
-        sensor : str
-            sensor name
-        connection : sqlalchemy.engine.base.Connection
+        SensorName : str
     
         Returns
         -------
@@ -168,7 +229,7 @@ class Get:
         JOIN 
          	MonitoringPoints ON WellDiver.MonitoringPointID = MonitoringPoints.ID
         WHERE
-         	DiversName = '{sensor}'
+         	DiversName = '{SensorName}'
         ''' 
     
     
@@ -190,11 +251,11 @@ class Get:
     
     def DiverStatus (self):
         '''
+        Get class method 
         
-    
         Parameters
-        ----------
-        connection : sqlalchemy.engine.base.Connection
+        -------
+            None. It just requires the Get class to be instantiated.
             
         Returns
         -------
@@ -236,14 +297,31 @@ class Get:
         df['NextUpdate_t'] = t_list
         df['NextUpdate_ts'] = epoch_list      
     
+        self.DiverStatus_df = df
+        return df
+       
+    def Table (self, TableName : str):
+        '''
+        Retrieves entire table from database
+        
+        Parameters
+        ----------
+        TableName : str
+        
+        Returns
+        -------
+        df : pd.core.frame.DataFrame
+            table
+        '''
+        
+        q = f'SELECT * from {TableName}'
+        df = pd.read_sql(q, con = self.connection)
         return df
         
-    
     def CheckDuplicateEntry (self, MonitoringPointID : int, VariableID : int, df: pd.core.frame.DataFrame ):
         '''
         It checks duplicate entries in the PointsMeasurements table and drop these values
         
-
         Parameters
         ----------
         connection : sqlalchemy.engine.base.Connection
@@ -277,11 +355,8 @@ class Get:
         
         return df
     
-class LongTimeSeries (Get):
-    #store dataframes here
-    Runs = {}
-    
-    def __init__ (self, Get_, connection : sqlalchemy.engine.base.Connection, FilterVariableID : int) :
+    def LongTimeSeries (self, FilterVariableID : int):
+
         '''
         Long query for the PointsMeasurements. Query gets stored in the attribute Runs
         If the variable is run. It will be retrieved faster next time because it is store within a class attribute Runs : dict.
@@ -305,13 +380,12 @@ class LongTimeSeries (Get):
         df = q.DataFrame #Retrieving dataframe
                 
         '''
-        self.connection = Get_.connection
             
         start_time = time.perf_counter()
         
-        Runs_key = f'{FilterVariableID}' 
+        Runs_key = FilterVariableID
         
-        if Runs_key not in self.Runs:
+        if Runs_key not in self.LongTimeSeries_Runs:
             query = f'''
             SELECT 
             	PointsMeasurements.ID, PointsMeasurements.MonitoringPointID, PointsMeasurements.TimeStamp, PointsMeasurements.VariableID, PointsMeasurements.Value,
@@ -333,19 +407,15 @@ class LongTimeSeries (Get):
             DataFrame ['Date'] = pd.to_datetime(DataFrame.TimeStamp * 1e9)
             end_time = time.perf_counter()
             #store run in class dictionary
-            self.Runs [FilterVariableID] = DataFrame            
-            self.DataFrame = DataFrame
+            self.LongTimeSeries_Runs [FilterVariableID] = DataFrame            
+            self.LongTimeSeries_df = DataFrame
             self.RunTime = end_time - start_time
             
         else:                    
-            self.DataFrame = self.Runs[Runs_key]
+            self.LongTimeSeries_df = self.LongTimeSeries_Runs[Runs_key]
                 
             
-class ShortTimeSeries (Get):
-    #store dataframes here
-    Runs = {}
-    
-    def __init__ (self, Get_, connection : sqlalchemy.engine.base.Connection, FilterVariableID : int, FilterMonitoringPoint : str) :
+    def ShortTimeSeries (self, FilterVariableID : int, FilterMonitoringPoint : str):
         '''
         Same principle of the other query
 
@@ -360,14 +430,12 @@ class ShortTimeSeries (Get):
             Nothing. The resultant query is stored in a pandas.core.frame.DataFrame format as a class attribute.
 
         '''
-        
-        self.connection = Get_.connection
-            
+                        
         start_time = time.perf_counter()
         
-        Runs_key = f'{FilterVariableID}_{FilterMonitoringPoint }' 
+        Runs_key = f'{FilterVariableID}_{FilterMonitoringPoint}' 
         
-        if Runs_key not in self.Runs:
+        if Runs_key not in self.ShortTimeSeries_Runs:
             query = f'''
             SELECT 
             	PointsMeasurements.ID, PointsMeasurements.MonitoringPointID, PointsMeasurements.TimeStamp, PointsMeasurements.VariableID, PointsMeasurements.Value,
@@ -389,190 +457,176 @@ class ShortTimeSeries (Get):
             DataFrame ['Date'] = pd.to_datetime(DataFrame.TimeStamp * 1e9)
             end_time = time.perf_counter()
             #store run in class dictionary
-            self.Runs [FilterVariableID] = DataFrame            
-            self.DataFrame = DataFrame
+            self.ShortTimeSeries_Runs [Runs_key] = DataFrame            
+            self.ShortTimeSeries_df = DataFrame
             self.RunTime = end_time - start_time
             
         else:                    
-            DataFrame = self.Runs[Runs_key]
-            self.DataFrame = DataFrame
+            DataFrame = self.ShortTimeSeries_Runs[Runs_key]
+            self.ShortTimeSeries_df = DataFrame
+
     
+    def Isolines(self , Year, Month, Day, Hour):
+
+        '''
+        Query used to produce the dashboard map
+       
+
+        Parameters
+        ----------
+        connection : sqlalchemy.engine.base.Connection
+        Year : int
+        Month : int
+        Day : int
+        Hour : int
+        
+        Returns
+        -------
+            Nothing. The resultant query is stored in a pandas.core.frame.DataFrame format as a class attribute.
+        '''
     
-    class Isolines(Get):
-        #store dataframes here
-        Runs = {}
-        def __init__ (self, Get_, connection : sqlalchemy.engine.base.Connection,  Year, Month, Day, Hour) :
+        start_time = time.perf_counter()
+
+        if Hour < 10:
+            Hour = '0'+str(Hour)
+    
+        datetime = pd.to_datetime(f'{Year}-{Month}-{Day} {Hour}')
+        
+        l_t = datetime - timedelta (hours = 0.5)
+        u_t = datetime + timedelta (hours = 0.5)
+        
+        l_ts = int(l_t.value / 1e9)
+        u_ts = int(u_t.value / 1e9)
+               
+        #generating Key for the class dictionary
+        Runs_key = str(datetime)
+
+        
+        if Runs_key not in self.Isolines_Runs:
+            #START FROM HERE - LINE WHERE 99
+            query = f'''
+            SELECT 
+            	PointsMeasurements.MonitoringPointID, PointsMeasurements.TimeStamp, PointsMeasurements.VariableID, PointsMeasurements.Value,
+            	MonitoringPoints.ID, MonitoringPoints.Name as MonitoringPointName, MonitoringPoints.PointID, Points.ID, Points.E, Points.N,
+            	Variables.ID, Variables.Name AS Type
+            FROM 
+            	PointsMeasurements
+            JOIN
+            	MonitoringPoints ON PointsMeasurements.MonitoringPointID = MonitoringPoints.ID
+            JOIN
+            	Points ON MonitoringPoints.PointID = Points.ID	
+            JOIN	
+            	Variables ON PointsMeasurements.VariableID = Variables.ID
+            WHERE
+                TimeStamp BETWEEN {l_ts} AND {u_ts}
             '''
-            Query used to produce the dashboard map
-           
     
-            Parameters
-            ----------
-            connection : sqlalchemy.engine.base.Connection
-            Year : int
-            Month : int
-            Day : int
-            Hour : int
+            DataFrame = pd.read_sql(query, con = self.connection)
+            DataFrame = DataFrame [DataFrame.VariableID.isin([0,7])]
+        
+            # indexing columns    
+            cols = ['MonitoringPointID', 'MonitoringPointName', 'Time', 'Type', 'Value', 'E', 'N']
+
+            #dropping constant variable
+            DataFrame['Time'] = pd.to_datetime(DataFrame.TimeStamp * 1e9)
+            DataFrame = DataFrame[cols]
             
-            Returns
-            -------
-                Nothing. The resultant query is stored in a pandas.core.frame.DataFrame format as a class attribute.
+            # taking average values for duplicated values
+            if DataFrame.duplicated(subset = ['MonitoringPointName']).any():
+                v = DataFrame.groupby('MonitoringPointName').Value.mean().values
+                t = DataFrame.groupby('MonitoringPointName')['Time'].mean().values
+                df = DataFrame.drop_duplicates(subset = ['MonitoringPointID'])
+                df = df.drop(['MonitoringPointID', 'Time'], axis = 1)
+                df['Value'] = v
+                df['Time'] = t
+                DataFrame = df.copy()
+
+            end_time = time.perf_counter()
+            self.RunTime = end_time - start_time
+            self.Isolines_df = DataFrame
+            self.datetime = datetime
+            # self.VariableName = VariableName
+            #adding run to class attribute
+            self.Isolines_Runs [Runs_key] = DataFrame #store in class variable
+
+        #conditional to retrieve dataframe from class attribute! it minimizes querying time
+        else:
+            #getting object's attributes
+            self.Isolines_df = self.Isolines_Runs[Runs_key]           
+    
+    
+    def HydroProfile (self):
+        '''
+        Long query for the hydrogeological profiles. They can be index by drill.
+
+        Parameters
+        ----------
+        connection : sqlalchemy.engine.base.Connection
+
+        Returns
+        -------
+            Nothing. The resultant query is stored in a pandas.core.frame.DataFrame format as a class attribute.
+
+        '''
+    
+        start_time = time.perf_counter()
+
+        
+        if 'HydroProfile' in self.HydroProfile_Runs:
+            self.HydroProfile_df = self.HydroProfile_Runs['HydroProfile']
+        else:                    
+            query = '''
+            SELECT
+            	DrillingTests.ID, DrillingTests.PointID, DrillingTests.TestTypeID, DrillingTests.Depth, DrillingTests.Value,
+            	TestsType.ID AS TestTypeID, TestsType.Unit, TestsType.Name as TestType, TestsType.ShortName,
+            	Points.ID AS PointID2, Points.Name as DrillName, Points.Depth, Points.MonitoringPoint, Points.E, Points.N
+            
+            FROM 
+            	DrillingTests
+            JOIN
+            	TestsType ON DrillingTests.TestTypeID = TestsType.ID
+            JOIN
+            	Points ON DrillingTests.PointID = Points.ID	
             '''
             
-            self.connection = Get_.connection
+            DataFrame = pd.read_sql(query, con = self.connection)
+            cols = ['ID', 'PointID', 'DrillName', 'TestType','Unit', 'Depth', 'MonitoringPoint',
+                    'Value', 'E', 'N']
+            DataFrame = DataFrame[cols]
+
+            end_time = time.perf_counter()
+            self.RunTime = end_time - start_time
+            self.HydroProfile_df = DataFrame
+            self.HydroProfile_Runs ['HydroProfile'] = DataFrame #store in class variable
+
+    
+
+
+
+#Local tests
+# if __name__ == '__main__':
         
-            start_time = time.perf_counter()
-    
-            if Hour < 10:
-                Hour = '0'+str(Hour)
+
         
-            datetime = pd.to_datetime(f'{Year}-{Month}-{Day} {Hour}')
-            
-            l_t = datetime - timedelta (hours = 0.5)
-            u_t = datetime + timedelta (hours = 0.5)
-            
-            l_ts = int(l_t.value / 1e9)
-            u_ts = int(u_t.value / 1e9)
-                   
-            #generating Key for the class dictionary
-            Runs_key = str(datetime)
-    
-            
-            if Runs_key not in self.Runs:
-                #START FROM HERE - LINE WHERE 99
-                query = f'''
-                SELECT 
-                	PointsMeasurements.MonitoringPointID, PointsMeasurements.TimeStamp, PointsMeasurements.VariableID, PointsMeasurements.Value,
-                	MonitoringPoints.ID, MonitoringPoints.Name as MonitoringPointName, MonitoringPoints.PointID, Points.ID, Points.E, Points.N,
-                	Variables.ID, Variables.Name AS Type
-                FROM 
-                	PointsMeasurements
-                JOIN
-                	MonitoringPoints ON PointsMeasurements.MonitoringPointID = MonitoringPoints.ID
-                JOIN
-                	Points ON MonitoringPoints.PointID = Points.ID	
-                JOIN	
-                	Variables ON PointsMeasurements.VariableID = Variables.ID
-                WHERE
-                    TimeStamp BETWEEN {l_ts} AND {u_ts}
-                '''
-        
-                DataFrame = pd.read_sql(query, con = self.connection)
-                DataFrame = DataFrame [DataFrame.VariableID.isin([0,7])]
-            
-                # indexing columns    
-                cols = ['MonitoringPointID', 'MonitoringPointName', 'Time', 'Type', 'Value', 'E', 'N']
-    
-                #dropping constant variable
-                DataFrame['Time'] = pd.to_datetime(DataFrame.TimeStamp * 1e9)
-                DataFrame = DataFrame[cols]
-                
-                # taking average values for duplicated values
-                if DataFrame.duplicated(subset = ['MonitoringPointName']).any():
-                    v = DataFrame.groupby('MonitoringPointName').Value.mean().values
-                    t = DataFrame.groupby('MonitoringPointName')['Time'].mean().values
-                    df = DataFrame.drop_duplicates(subset = ['MonitoringPointID'])
-                    df = df.drop(['MonitoringPointID', 'Time'], axis = 1)
-                    df['Value'] = v
-                    df['Time'] = t
-                    DataFrame = df.copy()
-    
-                end_time = time.perf_counter()
-                self.RunTime = end_time - start_time
-                self.DataFrame = DataFrame
-                self.datetime = datetime
-                # self.VariableName = VariableName
-                #adding run to class attribute
-                self.Runs [Runs_key] = DataFrame #store in class variable
-    
-            #conditional to retrieve dataframe from class attribute! it minimizes querying time
-            else:
-                #getting object's attributes
-                self.DataFrame = self.Runs[Runs_key]           
+    # engine, connection, session = u.DbCon(database_fn)
     
     
-    class HydroProfile (Get):
-        #store dataframes here
-        Runs = {}
-        def __init__ (self, Get_, connection : sqlalchemy.engine.base.Connection ) :
-            '''
-            Long query for the hydrogeological profiles. They can be index by drill.
-    
-            Parameters
-            ----------
-            connection : sqlalchemy.engine.base.Connection
-    
-            Returns
-            -------
-                Nothing. The resultant query is stored in a pandas.core.frame.DataFrame format as a class attribute.
-    
-            '''
+    # map_query = Isolines(connection,
+    #                        # Variable = var_id,
+    #                        Year = pd.to_datetime(date_wid).year,
+    #                        Month = pd.to_datetime(date_wid).month,
+    #                        Day = pd.to_datetime(date_wid).day,
+    #                        Hour = pd.to_datetime(date_wid).hour)
         
-            start_time = time.perf_counter()
-            
-            self.connection = Get_.connection
-            
-            if 'DataFrame' in self.Runs:
-                pass #gain computer time
-                self.DataFrame = self.Runs['DataFrame']
-            else:                    
-                query = '''
-                SELECT
-                	DrillingTests.ID, DrillingTests.PointID, DrillingTests.TestTypeID, DrillingTests.Depth, DrillingTests.Value,
-                	TestsType.ID AS TestTypeID, TestsType.Unit, TestsType.Name as TestType, TestsType.ShortName,
-                	Points.ID AS PointID2, Points.Name as DrillName, Points.Depth, Points.MonitoringPoint, Points.E, Points.N
-                
-                FROM 
-                	DrillingTests
-                JOIN
-                	TestsType ON DrillingTests.TestTypeID = TestsType.ID
-                JOIN
-                	Points ON DrillingTests.PointID = Points.ID	
-                '''
-                
-                DataFrame = pd.read_sql(query, con = self.connection)
-                cols = ['ID', 'PointID', 'DrillName', 'TestType','Unit', 'Depth', 'MonitoringPoint',
-                        'Value', 'E', 'N']
-                DataFrame = DataFrame[cols]
-                DataFrame.MonitoringPoint = [int.from_bytes(i, byteorder = 'big') for i in DataFrame.MonitoringPoint]
-                
-                print(query)
-                end_time = time.perf_counter()
-                self.RunTime = end_time - start_time
-                self.DataFrame = DataFrame
-                self.Runs ['DataFrame'] = DataFrame #store in class variable
+    # map_df = map_query.DataFrame.reset_index(drop = True)    
     
     
-    #Local tests
-    if __name__ == '__main__':
+    
+    # map_query = Isolines(connection,
+    #                         # Variable = var_id,
+    #                         Year = pd.to_datetime(date_wid).year,
+    #                         Month = pd.to_datetime(date_wid).month,
+    #                         Day = pd.to_datetime(date_wid).day,
+    #                         Hour = pd.to_datetime(date_wid).hour)
         
-        date_wid = '2022-12-12 00:00:00'
-        path = 'D:\\Repos\\PirnaCaseStudy\\Data'
-        database_fn = 'Database.db'
-        database_fn = path + '\\' + database_fn
-        
-        portal = Get(database_fn)
-        portal.get()
-        
-        # engine, connection, session = u.DbCon(database_fn)
-        
-        
-        # map_query = Isolines(connection,
-        #                        # Variable = var_id,
-        #                        Year = pd.to_datetime(date_wid).year,
-        #                        Month = pd.to_datetime(date_wid).month,
-        #                        Day = pd.to_datetime(date_wid).day,
-        #                        Hour = pd.to_datetime(date_wid).hour)
-            
-        # map_df = map_query.DataFrame.reset_index(drop = True)    
-        
-        
-        
-        # map_query = Isolines(connection,
-        #                         # Variable = var_id,
-        #                         Year = pd.to_datetime(date_wid).year,
-        #                         Month = pd.to_datetime(date_wid).month,
-        #                         Day = pd.to_datetime(date_wid).day,
-        #                         Hour = pd.to_datetime(date_wid).hour)
-            
-        # map_df = map_query.DataFrame.reset_index(drop = True)    
+    # map_df = map_query.DataFrame.reset_index(drop = True)    

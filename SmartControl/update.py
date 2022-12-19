@@ -1,12 +1,13 @@
 import os
+# import sys
 import pandas as pd
 from datetime import datetime
 import time
-import queries as q
-import api
-import utils as u
-from api import PegelAlarm
-from api import Inowas
+import SmartControl.api as api
+import SmartControl.utils as utils
+from SmartControl.api import PegelAlarm
+from SmartControl.api import Inowas
+
 
 
 fn = 'LOG_UPDATE0.txt' 
@@ -30,7 +31,7 @@ def SequenceUpdate (sensor, sts , Get_):
         t0 = time.perf_counter()
         
         ets = round(pd.to_datetime(datetime.now()).value / 1e9)
-        SensorsAPI_df, Sensors_df = api.GetDivers(Get.connection)
+        SensorsAPI_df, Sensors_df = api.GetDivers(Get_.connection)
         variables =  Sensors_df [ Sensors_df.Diver == sensor].VariableName #indexing variables of interest
         
         #build on top of the request package and calculate the parameters to request multiple times
@@ -40,7 +41,7 @@ def SequenceUpdate (sensor, sts , Get_):
             r = GWL(Get_, sensor, p, sts, ets)
             r.Request()
             
-            Process_df = u.Process(r.Request_df , Get_)           
+            Process_df = utils.Process(r.Request_df , Get_)           
 
 
             if Process_df is None:
@@ -95,7 +96,7 @@ def InowasLongAPItoSQL (Get_):
         sensor, sts = row.DiverName, row.NextUpdate_ts
         
     
-        SequenceUpdate (sensor, sts , Get)
+        SequenceUpdate (sensor, sts , Get_)
     
     t1 = time.perf_counter()
     with open(fn, 'a+') as f:
@@ -136,7 +137,7 @@ class RL (PegelAlarm):
             # self.MonitorintPointData()
             r = RL(self.Get_)
             r.Request()
-            self.Process_df = u.Process(r.Request_df,self.Get_)
+            self.Process_df = utils.Process(r.Request_df,self.Get_)
             self.Update( )            
             t1 = time.perf_counter()      
             
@@ -148,19 +149,19 @@ class RL (PegelAlarm):
             f.write(txt)     
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
         
     
-    path = 'D:\\Repos\\PirnaCaseStudy\\Data'
-    database_fn = 'Database.db'
-    database_fn = path + '\\' + database_fn    
-    Get = q.Get(database_fn)
+#     path = 'D:\\Repos\\PirnaCaseStudy\\Data'
+#     database_fn = 'Database.db'
+#     database_fn = path + '\\' + database_fn    
+#     Get = q.Get(database_fn)
     
-    r = RL(Get)
-    r.Request()
-    r.RiverAPItoSQL()
+#     r = RL(Get)
+#     r.Request()
+#     r.RiverAPItoSQL()
     
-    InowasLongAPItoSQL(Get)
+#     InowasLongAPItoSQL(Get)
     
     
 
