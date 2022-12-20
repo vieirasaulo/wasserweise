@@ -34,7 +34,7 @@ Step-by-step on how to setup a python ecossystem and deploy this.
 	* Create a folder to clone this repo
 		* git clone https://github.com/SauloVSFh/PirnaStudyCase
 		
-	* *Open the anaconda prompt*
+	* Open the anaconda prompt
 		* Go to the folder where you cloned the repository (PirnaStudyCase)
 		* Create a new environment and install the requirements (as of December 2022):
 			* Just type once you're in the folder:
@@ -42,12 +42,12 @@ Step-by-step on how to setup a python ecossystem and deploy this.
 				
 4. Run the app:
 	* If you accomplish the steps above, type:
-		* run app.py
+		* python app.py
 
 ## The Database
 *The database* is developed using *sqalchemy* models was specifically designed to target monitoring divers but in a way that it also enables the addition of other tables and types of measurements in the future. The models are present in the python module **SMARTControl.CreateDatabase** and can be used if such a task is desired. The database schema is as follows:
 
-![plot](Figures/schema.png)
+![plot](https://github.com/SauloVSFh/PirnaStudyCase/blob/master/Figures/Schema.png?raw=true)
 
 * Some possibilities are listed below:
 
@@ -80,30 +80,30 @@ Below, a brief description of each python module and its classes and functions i
 		* *UpdateID*
 		* *VariableID*
 3. **utils.py**
-		* **Dashboard map plotting capabilities**
-			* *arrow_head*
-			* *Folium_arrows*
-			* *Folium_contour*
-			* *Folium_map*
-		* *Gradient*
-		* *InterpolationGradient*
-		* *BoundaryCondition*
-		* *CompleteMissingDates*
-		* *ControlPoints*
-		* *DbCon*
-		* *TimeToString*
-		* *GetMonitoringPointData*
-		* *GetDivers*
-		* *GetDiverData*
-		* *CompleteMissingDates*
-		* *Process*
-		* *GetVariableID*
-		* *Process*
-		* *prepare_query*
-		* *PrepareIsolines
+	* **Dashboard map plotting capabilities**:
+		* *arrow_head*
+		* *Folium_arrows*
+		* *Folium_contour*
+		* *Folium_map*
+	* *Gradient*
+	* *InterpolationGradient*
+	* *BoundaryCondition*
+	* *CompleteMissingDates*
+	* *ControlPoints*
+	* *DbCon*
+	* *TimeToString*
+	* *GetMonitoringPointData*
+	* *GetDivers*
+	* *GetDiverData*
+	* *CompleteMissingDates*
+	* *Process*
+	* *GetVariableID*
+	* *Process*
+	* *prepare_query*
+	* *PrepareIsolines
 		
 4. **api.py**: a module to access APIs that hinges on two classes. Internal dependencies are: SmartControl.utils and SmartControl.queries.
-	* *Inowas
+	* *Inowas*
 	* *PegelAlarm*
 	* Both classes count on the Request method to access the api data after fetching preliminary information in the 'database.db' file.
 
