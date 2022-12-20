@@ -250,5 +250,4 @@ row3 = pn.Row(
 
 dashboard = pn.Column(row1 ,row2, row3)
 
-dashboard.servable()                  
-dashboard.serve()                  
+dashboard.show()
