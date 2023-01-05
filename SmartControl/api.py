@@ -90,6 +90,7 @@ class Inowas (queries.Get):
             ReferenceAltitude = DiverData.ReferenceAltitude.iloc [0]
             DiverDepth = DiverData.DiverDepth.iloc [0]
         
+            #convert diver read to hydraulic head
             if self.parameter == 'h_level':
                 head = ReferenceAltitude - DiverDepth + df.Value
                 df = df.drop('Value', axis=1)

@@ -507,8 +507,11 @@ class Get:
             query = f'''
             SELECT 
             	PointsMeasurements.MonitoringPointID, PointsMeasurements.TimeStamp, PointsMeasurements.VariableID, PointsMeasurements.Value,
-            	MonitoringPoints.ID, MonitoringPoints.Name as MonitoringPointName, MonitoringPoints.PointID, Points.ID, Points.E, Points.N,
-            	Variables.ID, Variables.Name AS Type
+            	MonitoringPoints.ID, MonitoringPoints.Name as MonitoringPointName, MonitoringPoints.PointID, MonitoringPoints.ReferenceAltitude as CaseTop, 
+            	Points.ID, Points.E, Points.N, 
+            	Variables.ID, Variables.Name AS Type,
+            	WellDiver.DiverID, WellDiver.DiverDepth, WellDiver.MonitoringPointID AS MonitoringPointID2,
+            	Divers.ID, Divers.Name as DiverName
             FROM 
             	PointsMeasurements
             JOIN
@@ -517,15 +520,19 @@ class Get:
             	Points ON MonitoringPoints.PointID = Points.ID	
             JOIN	
             	Variables ON PointsMeasurements.VariableID = Variables.ID
+            JOIN
+            	WellDiver ON PointsMeasurements.MonitoringPointID = MonitoringPointID2
+            JOIN
+            	Divers ON WellDiver.DiverID = Divers.ID
             WHERE
                 TimeStamp BETWEEN {l_ts} AND {u_ts}
             '''
     
             DataFrame = pd.read_sql(query, con = self.connection)
-            DataFrame = DataFrame [DataFrame.VariableID.isin([0,7])]
+            DataFrame = DataFrame [DataFrame.VariableID.isin([0,7])] #indexing head and raingage
         
             # indexing columns    
-            cols = ['MonitoringPointID', 'MonitoringPointName', 'Time', 'Type', 'Value', 'E', 'N']
+            cols = ['MonitoringPointID', 'MonitoringPointName', 'DiverName', 'Time', 'Type', 'CaseTop', 'DiverDepth', 'Value', 'E', 'N']
 
             #dropping constant variable
             DataFrame['Time'] = pd.to_datetime(DataFrame.TimeStamp * 1e9)

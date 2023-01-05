@@ -1,4 +1,5 @@
 import os
+import os
 from sqlalchemy import create_engine
 from sqlalchemy import Column, String, Integer, Float, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
@@ -36,7 +37,6 @@ class Divers(base):
     Project = Column(String(16))
     Name = Column(String(32))
     Company = Column(String(32))
-    Depth = Column(Float)
     IOT = Column(Boolean)
     Active = Column(Boolean)
     Functioning = Column(Boolean)
@@ -44,13 +44,12 @@ class Divers(base):
     Obs = Column(String(128))
     
     
-    def __init__ (self, ID, LongID, Project, Name, Company, Depth , IOT, Active, Functioning, Variables, Obs):
+    def __init__ (self, ID, LongID, Project, Name, Company, IOT, Active, Functioning, Variables, Obs):
         self.ID = ID
         self.LongID = LongID
         self.Project = Project
         self.Name = Name
         self.Company = Company
-        self.Depth = Depth
         self.IOT = IOT
         self.Active = Active
         self.Functioning = Functioning
