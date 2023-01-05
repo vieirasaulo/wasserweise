@@ -87,10 +87,14 @@ class Inowas (queries.Get):
             
             df = df [['MonitoringPointID','TimeStamp', 'VariableID', 'Value']]
             
+            df = df.loc [ (df.Value != 0.0) ]
+            df = df.loc [~ (df.Value.isnull()) ].reset_index(drop = True)
+            
+            
             ReferenceAltitude = DiverData.ReferenceAltitude.iloc [0]
             DiverDepth = DiverData.DiverDepth.iloc [0]
         
-            #convert diver read to hydraulic head
+            # convert diver read to hydraulic head
             if self.parameter == 'h_level':
                 head = ReferenceAltitude - DiverDepth + df.Value
                 df = df.drop('Value', axis=1)
