@@ -184,10 +184,10 @@ class PointsMeasurements (base):
     
     ''' 
     this line of code can delete the database table. Do not run it
-    '''
-    #########################3 connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))#####################################
-    
-    '''
+
+    ########################### connection.execute('DROP TABLE IF EXISTS {}'.format(__tablename__))#####################################
+
+
     Values from divers will be read but they have to be transferred to wells 
     before passing them into the database.
     

@@ -1,5 +1,5 @@
 import os
-# import sys
+import numpy as np
 import pandas as pd
 from datetime import datetime
 import time
@@ -7,10 +7,11 @@ import SmartControl.api as api
 import SmartControl.utils as utils
 from SmartControl.api import PegelAlarm
 from SmartControl.api import Inowas
+import SmartControl.queries
 
 
 
-fn = 'LOG_UPDATE0.txt' 
+fn = 'LOG_UPDATE.txt' 
     
 class GWL (Inowas):
     '''
@@ -71,7 +72,7 @@ def SequenceUpdate (sensor, sts , Get_):
                     txt = f"\nFor a reason it didn't run for sensor {sensor} and parameter {p}. It could be that it is updated "
                     print (txt)    
                     f.write (txt)
-        txt = f"\n\n End of Update for sensor {sensor}"
+        txt = f"\n End of Update for sensor {sensor}\n\n"
         print (txt)    
         f.write (txt)
             
@@ -83,7 +84,7 @@ def InowasLongAPItoSQL (Get_):
     
     if fn in os.listdir():
         with open(fn, 'a+') as f:
-            f.write('\n\n\n\n\n\n\n')
+            f.write('\n\n')
     with open(fn, 'a+') as f:
         f.write('*************************************NEW RUN INOWAS*************************************')    
         now = datetime.now()
@@ -94,7 +95,8 @@ def InowasLongAPItoSQL (Get_):
     for i in (FunctioningDivers_df.iterrows()):
         row = i[1]
         sensor, sts = row.DiverName, row.NextUpdate_ts
-        
+        if np.isnan(sts):
+            sts = 1420934400
     
         SequenceUpdate (sensor, sts , Get_)
     
@@ -114,13 +116,15 @@ class RL (PegelAlarm):
     Inheriting the methods and attributes from api.PagelAlarm to apply update function
     '''
     def Update (self):
-        
+                    
         if self.Process_df.shape[0]>0:
             self.Process_df.to_sql(name="PointsMeasurements", con= self.connection, if_exists="append", index=False)
-            print (f'River data updated from ID {self.Process_df.iloc[0,0]} to ID {self.Process_df.iloc[-1,0]}')
+            text = f'\n\nRiver data updated from ID {self.Process_df.iloc[0,0]} to ID {self.Process_df.iloc[-1,0]}'
+            return text
         else:     
-            print ('River data is up-to-date')
-        
+            text = '\n\nRiver data is up-to-date'
+            return text                
+            
 
     def RiverAPItoSQL (self):
         if fn in os.listdir():
@@ -134,11 +138,13 @@ class RL (PegelAlarm):
             txt = f'\n\nProgram run on the following date: {now}'
             print(txt)
             f.write(txt)
-            # self.MonitorintPointData()
             r = RL(self.Get_)
             r.Request()
             self.Process_df = utils.Process(r.Request_df,self.Get_)
-            self.Update( )            
+            txt = self.Update( )        
+            print(txt)
+            f.write(txt)
+            
             t1 = time.perf_counter()      
             
             txt = f"\n\nEnd of the update for PEGELALARM.AT. The running time was {round(t1-t0)} s"
@@ -149,19 +155,20 @@ class RL (PegelAlarm):
             f.write(txt)     
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
         
     
-#     path = 'D:\\Repos\\PirnaCaseStudy\\Data'
-#     database_fn = 'Database.db'
-#     database_fn = path + '\\' + database_fn    
-#     Get = q.Get(database_fn)
+    path = 'D:\\Repos\\PirnaCaseStudy\\Data'
+    database_fn = 'Database.db'
+    database_fn = path + '\\' + database_fn    
+    Get = SmartControl.queries.Get(database_fn)
     
-#     r = RL(Get)
-#     r.Request()
-#     r.RiverAPItoSQL()
+    os.chdir(path)
+    r = RL(Get)
+    r.Request()
+    r.RiverAPItoSQL()
     
-#     InowasLongAPItoSQL(Get)
+    InowasLongAPItoSQL(Get)
     
     
 

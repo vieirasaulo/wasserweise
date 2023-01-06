@@ -85,23 +85,28 @@ Below, a brief description of each python module and its classes and functions i
 		* *Folium_arrows*
 		* *Folium_contour*
 		* *Folium_map*
-	* *Gradient*
-	* *InterpolationGradient*
-	* *BoundaryCondition*
-	* *CompleteMissingDates*
-	* *ControlPoints*
-	* *DbCon*
-	* *TimeToString*
-	* *GetMonitoringPointData*
-	* *GetDivers*
-	* *GetDiverData*
-	* *CompleteMissingDates*
-	* *Process*
-	* *GetVariableID*
-	* *Process*
-	* *prepare_query*
-	* *PrepareIsolines
+	* **Workflow**
+		* *Gradient*
+		* *InterpolationGradient*
+		* *BoundaryCondition*
+		* *CompleteMissingDates*
+		* *ControlPoints*
+		* *DbCon*
+		* *TimeToString*
+		* *GetMonitoringPointData*
+		* *GetDivers*
+		* *GetDiverData*
+		* *CompleteMissingDates*
+		* *Process*
+		* *GetVariableID*
+		* *Process*
+		* *prepare_query*
+		* *PrepareIsolines
+	* **Management of database**
+		* *FixOutliers*
+		* *FixValueByDate*
 		
+			
 4. **api.py**: a module to access APIs that hinges on two classes. Internal dependencies are: SmartControl.utils and SmartControl.queries.
 	* *Inowas*
 	* *PegelAlarm*

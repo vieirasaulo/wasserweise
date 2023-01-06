@@ -61,24 +61,27 @@ def InputDatabase (table , func ):
 '''
 Uncomment below the inputs wanted
 '''
-InputDatabase(Tables_list[0], db.Divers)
+# InputDatabase(Tables_list[0], db.Divers)
 
-InputDatabase(Tables_list[1], db.DrillingTests)
+# InputDatabase(Tables_list[1], db.DrillingTests)
 
 # ['Divers', 'DrillingTests', 'MonitoringPoints',
 #                'Points', 'PointsMeasurements', 'TestsType',
 #                'Variables', 'WellDiver']
 
 
-InputDatabase(Tables_list[2], db.MonitoringPoints)
+# InputDatabase(Tables_list[2], db.MonitoringPoints)
 
-InputDatabase(Tables_list[3], db.Points)
+# InputDatabase(Tables_list[3], db.Points)
+
+
 
 # InputDatabase(Tables_list[4], db.PointsMeasurements)
 
-InputDatabase(Tables_list[5], db.TestsType)
 
-InputDatabase(Tables_list[6], db.Variables)
+# InputDatabase(Tables_list[5], db.TestsType)
 
-InputDatabase(Tables_list[7], db.WellDiver)
+# InputDatabase(Tables_list[6], db.Variables)
+
+# InputDatabase(Tables_list[7], db.WellDiver)
 

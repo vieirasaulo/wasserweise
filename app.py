@@ -86,7 +86,7 @@ PALETTE = ["#00CED1", "#006400"]
 
     
 g_df = df.groupby(['Name', pd.Grouper(freq='D')])['Value'].mean().to_frame().reset_index()
-gr_df = r_df.groupby(['Name', pd.Grouper(freq='D')])['Value'].mean().to_frame().reset_index()
+gr_df = r_df.groupby(['MonitoringPointName', pd.Grouper(freq='D')])['Value'].mean().to_frame().reset_index()
 g_df = pd.concat ([g_df, gr_df])
 
 
@@ -109,7 +109,7 @@ iScatterTS = iBindTS.hvplot.scatter(
     width = 1400, alpha = 0.4, grid = True, size = 50,
     ylabel = 'Hydraulic head (m)', xlabel = 'Time',
     color = 'aqua', legend = True,
-                           )
+                            )
 
 scatter_rg = gr_df.hvplot.scatter(
     x='Date', y='Value',
@@ -148,18 +148,18 @@ def iPlot (date_wid, scalearrows_wid):
 
 
         grid_x_gcs , grid_y_gcs , grid_z_gcs, U , V = sc.utils.Interpolation_Gradient (map_gdf , crs_utm = 25833 ,
-                                                                                       pixel_size = 10)
+                                                                                        pixel_size = 10)
 
         x = grid_x_gcs
         y = grid_y_gcs
 
         arrows_df = sc.utils.arrow_head (grid_x_gcs , grid_y_gcs , grid_z_gcs, U , V , scale = scalearrows_wid)
         df = arrows_df [ arrows_df.index.isin( np.arange(0 ,
-                                                         arrows_df.shape[0],
-                                                         2
+                                                          arrows_df.shape[0],
+                                                          2
                                                         )
-                                             )
-                       ].reset_index (drop = True)
+                                              )
+                        ].reset_index (drop = True)
 
 
 
@@ -205,7 +205,7 @@ iMap_col = pn.Column(Row1, Row2,
                     sizing_mode = 'stretch_width',
                     )
                     
- # Header
+  # Header
 Inowas_fn = 'Figures/INOWAS.jpg'
 SMARTControl_fn = 'Figures/SmartControl.png'
 dashboard_title = pn.panel('## SMART-Control')
@@ -217,13 +217,13 @@ row1 = pn.Row(col1_r1, pn.Spacer(width=450),
               col2_r1,  background='aqua',
               height = 50, height_policy = 'fixed',
               sizing_mode = 'stretch_width',
-             ) #top, right, bottom, left in pxls col3_r1, margin=(0, 100, 0, -5),
+              ) #top, right, bottom, left in pxls col3_r1, margin=(0, 100, 0, -5),
 
 #Tabs
 row2 = pn.Tabs (('Map', iMap_col) ,
                 ('Scatter', iScatterTS), 
                 sizing_mode = 'stretch_both'
-               )
+                )
 
 
 #Bottom
@@ -243,7 +243,7 @@ row3 = pn.Row(
     background='turquoise',
     height = 50, height_policy = 'fixed',
     sizing_mode = 'stretch_width' 
-             )
+              )
 
 
 

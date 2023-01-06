@@ -96,13 +96,17 @@ class Get:
         '''
     
         last_date_df = pd.read_sql(query, con = self.connection)
-        last_ts = last_date_df.iloc[0,2]
-        last_t = pd.to_datetime(last_ts * 1e9)
+        try:
+            last_ts = last_date_df.iloc[0,2]
+            last_t = pd.to_datetime(last_ts * 1e9)
+            
+            first_t = last_t + timedelta(hours=1) #first time - adding an hour to last time saved
+            first_ts = int(first_t.value / 1e9) #converting to timestamp
+            return first_t, first_ts
         
-        first_t = last_t + timedelta(hours=1) #first time - adding an hour to last time saved
-        first_ts = int(first_t.value / 1e9) #converting to timestamp
-        
-        return first_t, first_ts
+        except Exception:
+            first_t, first_ts = None, None
+            return first_t, first_ts
     
     def StartEndDate ( self, limit = 50):
         '''    
@@ -439,7 +443,7 @@ class Get:
             query = f'''
             SELECT 
             	PointsMeasurements.ID, PointsMeasurements.MonitoringPointID, PointsMeasurements.TimeStamp, PointsMeasurements.VariableID, PointsMeasurements.Value,
-            	MonitoringPoints.ID, MonitoringPoints.Name, MonitoringPoints.PointID,
+            	MonitoringPoints.ID, MonitoringPoints.Name as MonitoringPointName, MonitoringPoints.PointID,
             	Points.ID, Points.E, Points.N
             FROM 
             	PointsMeasurements
@@ -455,6 +459,12 @@ class Get:
             DataFrame = DataFrame.iloc[:,1:]
             DataFrame = DataFrame.loc[:, ~DataFrame.columns.duplicated()]
             DataFrame ['Date'] = pd.to_datetime(DataFrame.TimeStamp * 1e9)
+            
+            cols = ['MonitoringPointID', 'MonitoringPointName' ,'TimeStamp', 'Date', 
+                    'VariableID', 'Value', 'E', 'N']
+            
+            DataFrame = DataFrame [cols]
+            
             end_time = time.perf_counter()
             #store run in class dictionary
             self.ShortTimeSeries_Runs [Runs_key] = DataFrame            
@@ -507,6 +517,29 @@ class Get:
             query = f'''
             SELECT 
             	PointsMeasurements.MonitoringPointID, PointsMeasurements.TimeStamp, PointsMeasurements.VariableID, PointsMeasurements.Value,
+            	MonitoringPoints.ID, MonitoringPoints.Name as MonitoringPointName, MonitoringPoints.PointID, 
+            	Points.ID, Points.E, Points.N, 
+            	Variables.ID, Variables.Name AS Type
+            FROM 
+            	PointsMeasurements
+            JOIN
+            	MonitoringPoints ON PointsMeasurements.MonitoringPointID = MonitoringPoints.ID
+            JOIN
+            	Points ON MonitoringPoints.PointID = Points.ID	
+            JOIN	
+            	Variables ON PointsMeasurements.VariableID = Variables.ID
+            WHERE
+                TimeStamp BETWEEN {l_ts} AND {u_ts}
+            '''
+            
+            '''
+            query to retrieve more data and check wrong values that are requested from INOWAS api
+            It reduces the number of row of the query because the join function cuts out rows that have no divers
+            '''
+            
+            query_debug = f'''
+            SELECT 
+            	PointsMeasurements.MonitoringPointID, PointsMeasurements.TimeStamp, PointsMeasurements.VariableID, PointsMeasurements.Value,
             	MonitoringPoints.ID, MonitoringPoints.Name as MonitoringPointName, MonitoringPoints.PointID, MonitoringPoints.ReferenceAltitude as CaseTop, 
             	Points.ID, Points.E, Points.N, 
             	Variables.ID, Variables.Name AS Type,
@@ -527,16 +560,19 @@ class Get:
             WHERE
                 TimeStamp BETWEEN {l_ts} AND {u_ts}
             '''
-    
+            
+            cols = ['MonitoringPointID', 'MonitoringPointName', 'Time', 'Type', 'Value', 'E', 'N']
+            cols_debug = ['MonitoringPointID', 'MonitoringPointName', 'DiverName', 'Time', 'Type', 'CaseTop', 'DiverDepth', 'Value', 'E', 'N']
+            
+            '''
+            change here once it's fixed
+            '''
             DataFrame = pd.read_sql(query, con = self.connection)
             DataFrame = DataFrame [DataFrame.VariableID.isin([0,7])] #indexing head and raingage
-        
-            # indexing columns    
-            cols = ['MonitoringPointID', 'MonitoringPointName', 'DiverName', 'Time', 'Type', 'CaseTop', 'DiverDepth', 'Value', 'E', 'N']
-
-            #dropping constant variable
             DataFrame['Time'] = pd.to_datetime(DataFrame.TimeStamp * 1e9)
+            # indexing columns    
             DataFrame = DataFrame[cols]
+            
             
             # taking average values for duplicated values
             if DataFrame.duplicated(subset = ['MonitoringPointName']).any():

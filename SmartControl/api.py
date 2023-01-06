@@ -57,6 +57,7 @@ class Inowas (queries.Get):
     
     def __init__(self, Get_, sensor, parameter : str, sts : int, ets : int):
         # Long url, short request -> one sensor one parameter
+        sts = int(sts)
         ones1p_url = f'https://sensors.inowas.com/sensors/project/DEU1/sensor/{sensor}/parameter/{parameter}?timeResolution=RAW&dateFormat=epoch&start={sts}&end={ets}&gt=-100.0'
         
         
@@ -69,6 +70,8 @@ class Inowas (queries.Get):
         self.parameter = parameter
         self.sensor = sensor
         self.Get_ = Get_
+        
+        print (ones1p_url)
         
     def Request(self):
         
@@ -87,8 +90,9 @@ class Inowas (queries.Get):
             
             df = df [['MonitoringPointID','TimeStamp', 'VariableID', 'Value']]
             
-            df = df.loc [ (df.Value != 0.0) ]
-            df = df.loc [~ (df.Value.isnull()) ].reset_index(drop = True)
+            #getting rid of zeros in the Inowas database
+            df.loc [ (df.Value == 0.0) , 'Value' ] = np.nan
+            df.loc [df.Value.isnull(), 'Value' ] = np.nan
             
             
             ReferenceAltitude = DiverData.ReferenceAltitude.iloc [0]
@@ -112,24 +116,40 @@ class PegelAlarm (queries.Get):
 
     def __init__ (self, Get_):
         
+        '''
+        It works for a single gage. It will throw an error if there is more.
+        '''
         #import instance variables to this class
         self.connection = Get_.connection
         self.Get_ = Get_
         
-        self.GageData = Get_.MonitoringPointData(GageData = 1)
-                       
-        GageID = self.GageData.MonitoringPointID.iloc[0]
+        Get_.MonitoringPointData(GageData = 1)
+        
+        MonitoringPointData_df = Get_.MonitoringPointData_df
+        GageData = Get_.GageData
+        
+        # self                       
+        GageID = GageData.MonitoringPointID.values[0]
         
         t0, ts0 = Get_.APIDate (MonitoringPointID = GageID)
         
         t0 = utils.TimeToString(t0)
         t1 = utils.TimeToString(pd.to_datetime(datetime.now()).round('s'))
         
-        parameter = f'&loadStartDate={t0}%2B0200&loadEndDate={t1}%2B0200'
-        url = f'https://api.pegelalarm.at/api/station/1.0/a/saulo_filho_tudresden/height/501040-de/history?granularity=hour&{parameter}'
+        bool_ = 'None' in t0
+        #if no value is present, then request from 2015.01 up until 2019.
+        if bool_:
+            url = 'https://api.pegelalarm.at/api/station/1.0/a/saulo_filho_tudresden/height/501040-de/history?granularity=hour&&loadStartDate=30.01.2015T12:00:00%2B0200&loadEndDate=00.00.2020T00:00:00%2B0200'
+        
+        else:
+            parameter = f'&loadStartDate={t0}%2B0200&loadEndDate={t1}%2B0200'
+            url = f'https://api.pegelalarm.at/api/station/1.0/a/saulo_filho_tudresden/height/501040-de/history?granularity=hour&{parameter}'
+            
         
         self.url = url
-
+        self.MonitoringPointData_df = MonitoringPointData_df 
+        self.GageData = GageData
+                
     def Request(self):
         #get data from API and return a data frame
         r = requests.get(self.url)
@@ -163,13 +183,15 @@ if __name__ == '__main__':
 
     Get = queries.Get(database_fn)
     
-    # r = PegelAlarm(Get)
+    r = PegelAlarm(Get)
+    
     # r.Request()
-    # df, update_id = u.Process(r.Request_df, Get)
+    # df = r.Request_df
+    # df_ = utils.Process(r.Request_df, Get)
     
     # print(r.MonitoringPointData())
     # print(r.GageData.columns)
     
     # I = Inowas(Get, 'I-2', 'ph', 1638445200, 1668465200 )
     # I.Request()
-    a, sensors_df = GetDivers(Get.connection)
+    # a, sensors_df = GetDivers(Get.connection)

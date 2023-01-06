@@ -14,6 +14,7 @@ import json
 import matplotlib.pyplot as plt
 import geojsoncontour
 import panel as pn
+from datetime import datetime
 
 def TimeToString (t: pd._libs.tslibs.timestamps.Timestamp):
     '''
@@ -230,6 +231,94 @@ def Gradient (grid_x, grid_y, grid_z):
     
     return u , v , mag, angle
 
+def FixOutliers (Get_, threshold : int = 106):
+    '''
+    Function to reset outliers based on threshold. From quick analysis, when the diver depth is 12.4 in the Pirna Test site,
+    the best is threshold is 108.    
+    The ouliers are values below what is expect and are obtained when the divers are exposed to the atmospheric pressure.
+    In other words, when they are removed from the well and the reading is transmitted to the database.
+
+    Parameters
+    ----------
+    Get_ : TYPE
+        Parameter with connectiong.
+    threshold : TYPE, optional
+        DESCRIPTION. The default is 106 : int.
+
+    Returns
+    -------
+    None.
+
+    '''
+    
+    conn = Get_.connection    
+    statement = f'''
+    UPDATE PointsMeasurements
+    SET   Value = NULL
+    WHERE Value < {threshold}	
+    '''
+    conn.execute(statement)
+    
+    print('Update successfully executed')
+    
+    conn.close()
+
+
+def FixValueByDate (Get_, MonitoringPointName , 
+                    LowerBoundaryDate : pd._libs.tslibs.timestamps.Timestamp,
+                    UpperBoundaryDate : pd._libs.tslibs.timestamps.Timestamp):
+    '''
+    Function to set values that do not make sense to Null
+
+    Parameters
+    ----------
+    Get_ : TYPE
+        Parameter with connectiong.
+    threshold : TYPE, optional
+        DESCRIPTION. The default is 106 : int.
+
+    Returns
+    -------
+    None.
+
+    '''
+    lts = int(int(LowerBoundaryDate.to_numpy()) / 1e9)
+    uts = int(int(UpperBoundaryDate.to_numpy()) / 1e9)   
+    
+    Get_.MonitoringPointData()
+    df = Get_.MonitoringPointData_df.copy()
+    
+    ID = df [df.MonitoringPointName == MonitoringPointName].MonitoringPointID.values[0]
+    
+    conn = Get_.connection    
+    statement = f'''
+    UPDATE PointsMeasurements
+    SET Value = Null
+    WHERE
+    	MonitoringPointID = {ID} and TimeStamp BETWEEN {lts} and {uts}
+    '''
+    conn.execute(statement)
+    
+    print('Update successfully executed')
+    
+    fn = 'Data/LOG_UPDATE.txt' 
+    txt = f'''
+    \n\n\n\n\n
+    *************************************Editting Database************************************* 
+    
+    MonitoringPoint ID = {ID} and Name = {MonitoringPointName} from date {LowerBoundaryDate} to {UpperBoundaryDate}
+    time stamp {lts} to {uts} were set to Null at: {str(datetime.now())}
+
+    
+    \n\n\n\n\n
+    *******************************************End*********************************************
+    '''
+    
+    with open (fn , '+a') as f:
+        f.write(txt)
+        print(txt)
+    conn.close()
+
 
 class PrepareIsolines (SmartControl.queries.Get):
 
@@ -321,12 +410,17 @@ def prepare_query (Get_, date_wid , crs_gcs = 4326):
             df = BoundaryCondition(df, df_).reset_index(drop = True)
             
             # Taking average values for the clustered GWM wells
-            df.loc [df.MonitoringPointName.str.len()>4 , 'cut'] = 1
-            df.loc [df.MonitoringPointName.str.len() <= 4 , 'cut'] = 0
-            gwms_mean = df[df.cut == 1].Value.mean()
-            df = df [~ df.index.isin (df[df.cut == 1].index[1:])]
-            df.loc [df.cut == 1, 'Value'] = gwms_mean
-            df = df.drop('cut', axis =1)
+            # df.loc [df.MonitoringPointName.str.len()>4 , 'cut'] = 1
+            # df.loc [df.MonitoringPointName.str.len() <= 4 , 'cut'] = 0
+            # gwms_mean = df[df.cut == 1].Value.mean()
+            # df = df [~ df.index.isin (df[df.cut == 1].index[1:])]
+            # df.loc [df.cut == 1, 'Value'] = gwms_mean
+            # df = df.drop('cut', axis =1)
+            
+            #Removing GWM05 and 03 - Values are weird
+            df = df.loc [df.MonitoringPointName != 'GWM05']
+            df = df.loc [df.MonitoringPointName != 'GWM03']
+            df = df.loc [df.MonitoringPointName != 'G21neu']
             
             map_df = df.copy()
             map_gdf = gpd.GeoDataFrame(map_df, geometry = gpd.points_from_xy (map_df.E, map_df.N), crs = crs_gcs).reset_index(drop = True)
@@ -343,7 +437,7 @@ def prepare_query (Get_, date_wid , crs_gcs = 4326):
         
 
 
-def Interpolation_Gradient (map_gdf : gpd.geodataframe.GeoDataFrame , crs_utm = 25833 , pixel_size = 5):
+def Interpolation_Gradient (map_gdf : gpd.geodataframe.GeoDataFrame , crs_utm = 25833 , pixel_size = 20):
     
     try:
         # 1. convert it to utm to get a real gradient
@@ -467,10 +561,13 @@ def Folium_contour ( m : folium.folium.Map,
         crs_gcs = 4326        
         
         #color map
-        orig_map=plt.cm.get_cmap('Blues')
-        reversed_map = orig_map.reversed()
+        # orig_map=plt.cm.get_cmap('Blues')
+        # reversed_map = orig_map.reversed()
         
-        contour = plt.contour(grid_x, grid_y, grid_z, linewidths = 2 , cmap = reversed_map)
+        max_ = np.nanmax(grid_z)
+        min_ = np.nanmin(grid_z)
+        levels = list(np.linspace(min_, max_ , 6))
+        contour = plt.contour(grid_x, grid_y, grid_z, linewidths = 2 , colors = 'steelblue', levels = levels)
         
         isolines_gdf = gpd.GeoDataFrame.from_features(
             json.loads(
@@ -506,6 +603,7 @@ def Folium_contour ( m : folium.folium.Map,
 
         points_list = [list(i[1].values) for i in points_gdf[['N', 'E']].iterrows()]
         
+        map_gdf['Value'] = np.round(map_gdf.Value, 2)
         i = 0
         try :
             for coordinates in points_list:
@@ -516,7 +614,7 @@ def Folium_contour ( m : folium.folium.Map,
                         popup = 
                             f'''
                             <b>Well: </b>{map_gdf.MonitoringPointName[i]}<br>
-                            <b>Head: </b>{round(map_gdf.Value[i], 2)} m<br>
+                            <b>Head: </b>{map_gdf.Value[i]} m<br>
                             '''
                     )
                 )
@@ -539,10 +637,16 @@ def Folium_contour ( m : folium.folium.Map,
             
             return text
 
-def Folium_arrows(m : folium.folium.Map, arrows_df : pd.core.frame.DataFrame):
+def Folium_arrows(m : folium.folium.Map, arrows_df : pd.core.frame.DataFrame, sample_size = 20):
     
     try : 
-        df = arrows_df.copy()
+        arrows_df = arrows_df.reset_index(drop = True)
+        min_ , max_ = arrows_df.index.min(), arrows_df.index.max()
+        size = int(max_ / 10)
+        indexes = np.linspace(min_, max_ , size).astype('int64')
+        # df = arrows_df.sample(n = sample_size).reset_index(drop = True)
+        df = arrows_df [arrows_df.index.isin(indexes)].reset_index(drop = True)
+        
         for i in range(df.shape[0]):
     
             coordinates=[(df['y'][i], df['x'][i]), (df['head_y'][i] , df['head_x'][i])]    
