@@ -4,8 +4,7 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-import SmartControl.CreateDatabase as CreateDatabase
+import SMARTControl.CreateDatabase as CreateDatabase
 
 class Get:
     def __init__ (self, database_fn : str):
@@ -167,7 +166,7 @@ class Get:
     
     def MonitoringPointData (self, GageData : bool = None):
         '''
-        
+        Function to retrieve information about all the monitoring points
 
         Parameters
         ----------
@@ -206,7 +205,7 @@ class Get:
     
     def DiverData (self, SensorName : str):
         '''
-        Get class method 
+        Get class method to retrieve sensor data
     
         Parameters
         ----------
@@ -306,7 +305,7 @@ class Get:
        
     def Table (self, TableName : str):
         '''
-        Retrieves entire table from database
+        Retrieves the entire raw table from database
         
         Parameters
         ----------
@@ -421,7 +420,7 @@ class Get:
             
     def ShortTimeSeries (self, FilterVariableID : int, FilterMonitoringPoint : str):
         '''
-        Same principle of the other query
+        Query for the PointsMeasurements per well. The resultant query is stored in a pandas.core.frame.DataFrame format as a class attribute.
 
         Parameters
         ----------
@@ -479,7 +478,7 @@ class Get:
     def Isolines(self , Year, Month, Day, Hour):
 
         '''
-        Query used to produce the dashboard map
+        Query used to retrieve monitoring data for a given variable and time.
        
 
         Parameters

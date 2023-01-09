@@ -2,8 +2,8 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import numpy as np
-import SmartControl.CreateDatabase as CreateDatabase
-import SmartControl.queries 
+import SMARTControl.CreateDatabase as CreateDatabase
+import SMARTControl.queries 
 import holoviews as hv
 from scipy.interpolate import griddata
 import xarray as xr
@@ -40,7 +40,7 @@ def TimeToString (t: pd._libs.tslibs.timestamps.Timestamp):
 
 def DbCon (database_fn : str):
     '''
-    Function that returns important variables to connect to the database using sqlaclchemy API
+    Function that returns important variables to connect to the database using sqlalchemy API
 
     Parameters
     ----------
@@ -124,14 +124,20 @@ def CompleteMissingDates (df: pd.core.frame.DataFrame ):
     return df
 
 def Process (df : pd.core.frame.DataFrame, Get_ ) :
-    
     '''
-    Function that process the input dataframe and prepare it to be inputed in the PointsMeasurements table
-    It first deployes the CheckDuplicateEntry function and checks if there is any duplicate entry 
-    It uses the CompleteMissingDates and fill gaps with NAN
+    Function that process the input dataframe and prepare it to be appended to the PointsMeasurements table.  It first deploys the CheckDuplicateEntry function and checks if there is any duplicate entry , and then deploys the CompleteMissingDates function to fill gaps with numpy.nan.
     
-    
-    '''  
+    Parameters
+    ----------
+    df : pd.core.frame.DataFrame
+    Get_ : SMARTControl.queries.Get
+
+    Returns
+    -------
+    df : pd.core.frame.DataFrame
+        file ready to be pushed to the database
+    '''
+
     if df is None : #if the requested_df is None than the process_df is also none
         return None
     else:
@@ -221,6 +227,24 @@ def LinearInterpolation (DataFrame : pd.core.frame.DataFrame , Longitude : str ,
     return grid_x, grid_y, grid_z
 
 def Gradient (grid_x, grid_y, grid_z):
+    '''
+    Function to find the gradient of the potentiometric surface.
+
+    Parameters
+    ----------
+    grid_x:  np.ndarray
+    grid_y:  np.ndarray
+    grid_z:  np.ndarray 
+   
+    Returns
+    -------
+    u: np.ndarray 
+    v: np.ndarray 
+    mag: np.ndarray 
+    angle: np.ndarray 
+    '''
+
+    
     #gradient function
     PixelXSize = grid_x[:,0][0] - grid_x[:,0][1]
     PixelYSize = grid_y[:,0][0]- grid_y[:,1][0]
@@ -231,12 +255,9 @@ def Gradient (grid_x, grid_y, grid_z):
     
     return u , v , mag, angle
 
-def FixOutliers (Get_, threshold : int = 106):
+def FixOutliers (Get_, threshold : int = 108):
     '''
-    Function to reset outliers based on threshold. From quick analysis, when the diver depth is 12.4 in the Pirna Test site,
-    the best is threshold is 108.    
-    The ouliers are values below what is expect and are obtained when the divers are exposed to the atmospheric pressure.
-    In other words, when they are removed from the well and the reading is transmitted to the database.
+    Function to reset outliers based on threshold. From quick analysis, when the diver depth is 12.4 in the Pirna Test site. The best is threshold is 108. The ouliers are values below what is expect and are obtained when the divers are exposed to the atmospheric pressure. In other words, when they are removed from the well and the reading is transmitted to the database.
 
     Parameters
     ----------
@@ -268,7 +289,7 @@ def FixValueByDate (Get_, MonitoringPointName ,
                     LowerBoundaryDate : pd._libs.tslibs.timestamps.Timestamp,
                     UpperBoundaryDate : pd._libs.tslibs.timestamps.Timestamp):
     '''
-    Function to set values that do not make sense to Null
+    Function to replace value to null using date interval.
 
     Parameters
     ----------
@@ -320,7 +341,10 @@ def FixValueByDate (Get_, MonitoringPointName ,
     conn.close()
 
 
-class PrepareIsolines (SmartControl.queries.Get):
+class PrepareIsolines (SMARTControl.queries.Get):
+    '''
+    Old and inactive class
+    '''
 
     def DataFrame (self, date_wid):
         '''
@@ -373,20 +397,30 @@ class PrepareIsolines (SmartControl.queries.Get):
         return ds
 
 
-text=  pn.pane.Markdown ('''
+text =  pn.pane.Markdown ('''
         # <center>Not enough data on this date</center>
         <br>
         ''',align = 'center', style = {'font-size' : '1.5em'})
 
 
 
-def prepare_query (Get_, date_wid , crs_gcs = 4326):
+def prepare_query (Get_ : SMARTControl.queries.Get, date_wid , crs_gcs = 4326: int):
+    '''
+    Function to interpolate data the cubic method and find the gradient of the potentiometric surface. 
 
+    Parameters
+    ----------
+    Get_: SMARTControl.queries.Get
+    crs_gcs = 4326 : int
+    date_wid 
+        date read from the dashboard widget
     
+    Returns
+    -------
+    map_gdf : geopandas.geodataframe.GeoDataFrame 
+    river_gage_gdf : geopandas.geodataframe.GeoDataFrame 
     '''
-    Input with date_widget
-    
-    '''
+
     
             
     Get_.Isolines(Year = pd.to_datetime(date_wid).year,
@@ -417,7 +451,7 @@ def prepare_query (Get_, date_wid , crs_gcs = 4326):
             # df.loc [df.cut == 1, 'Value'] = gwms_mean
             # df = df.drop('cut', axis =1)
             
-            #Removing GWM05 and 03 - Values are weird
+            #Removing GWM05, 03 and G21neu - Values are weird
             df = df.loc [df.MonitoringPointName != 'GWM05']
             df = df.loc [df.MonitoringPointName != 'GWM03']
             df = df.loc [df.MonitoringPointName != 'G21neu']
@@ -437,7 +471,24 @@ def prepare_query (Get_, date_wid , crs_gcs = 4326):
         
 
 
-def Interpolation_Gradient (map_gdf : gpd.geodataframe.GeoDataFrame , crs_utm = 25833 , pixel_size = 20):
+def Interpolation_Gradient (map_gdf : gpd.geodataframe.GeoDataFrame , crs_utm = 25833 : int , pixel_size = 20 : int):
+    '''
+    Function to interpolate data the cubic method and find the gradient of the potentiometric surface. 
+
+    Parameters
+    ----------
+    map_gdf : gpd.geodataframe.GeoDataFrame
+    crs_utm = 25833 : int 
+    pixel_size = 20 : int
+   
+    Returns
+    -------
+    grid_x_gcs: numpy.ndarray 
+    grid_y_gcs: numpy.ndarray 
+    grid_z_utm: numpy.ndarray 
+    U: numpy.ndarray 
+    V: numpy.ndarray 
+    '''
     
     try:
         # 1. convert it to utm to get a real gradient
@@ -497,6 +548,25 @@ def arrow_head(grid_x : np.ndarray,
                v : np.ndarray ,
                scale : int = 5e2
                  ):
+    '''
+    Function to create arrow heads based on coordinates, gradient and a scale standard parameter.
+
+    Parameters
+    ----------
+    grid_x:  np.ndarray
+    grid_y:  np.ndarray
+    grid_z:  np.ndarray
+    u:  np.ndarray
+    v:  np.ndarray
+    scale: int
+    
+    Returns
+    -------
+    df : pandas.core.frame.DataFrame
+        dataframe with information with geometric information of arrow heads
+    '''
+     
+                 
     try : 
     
         df = pd.DataFrame ( { 
@@ -531,6 +601,18 @@ def arrow_head(grid_x : np.ndarray,
 
 
 def Folium_map (Get_ , zoom_start = 17):
+    '''
+    Function to create Folium map centered in the region of interest.
+
+    Parameters
+    ----------
+    Get_: SMARTControl.queries.Get
+    
+    Returns
+    -------
+    Map: folium.folium.Map
+    
+    '''
     
     df = Get_.MonitoringPointData()
     map_center = df.N.mean(), df.E.mean() 
@@ -552,8 +634,22 @@ def Folium_contour ( m : folium.folium.Map,
                     map_gdf : gpd.geodataframe.GeoDataFrame , 
                     river_gage_gdf: gpd.geodataframe.GeoDataFrame , 
                     grid_x : np.ndarray, grid_y : np.ndarray, grid_z : np.ndarray):
+    '''
+    Function to create a Folium contour map.
+
+    Parameters
+    ----------
+    m: SMARTControl.queries.Get
+    map_gdf: geopandas.geodataframe.GeoDataFrame , 
+    grid_x:  numpy.ndarray
+    grid_y:  numpy.ndarray
+    grid_z:  numpy.ndarray
     
+    Returns
+    -------
+    m: folium.folium.Map
     
+    '''
     if grid_x is None:
         return text
     

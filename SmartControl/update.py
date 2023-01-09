@@ -3,11 +3,11 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 import time
-import SmartControl.api as api
-import SmartControl.utils as utils
-from SmartControl.api import PegelAlarm
-from SmartControl.api import Inowas
-import SmartControl.queries
+import SMARTControl.api as api
+import SMARTControl.utils as utils
+from SMARTControl.api import PegelAlarm
+from SMARTControl.api import Inowas
+import SMARTControl.queries
 
 
 
@@ -161,7 +161,7 @@ if __name__ == '__main__':
     path = 'D:\\Repos\\PirnaCaseStudy\\Data'
     database_fn = 'Database.db'
     database_fn = path + '\\' + database_fn    
-    Get = SmartControl.queries.Get(database_fn)
+    Get = SMARTControl.queries.Get(database_fn)
     
     os.chdir(path)
     r = RL(Get)

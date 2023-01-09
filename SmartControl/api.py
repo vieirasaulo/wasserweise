@@ -7,13 +7,14 @@ import sqlalchemy
 import pandas as pd
 from datetime import datetime
 import numpy as np
-import SmartControl.utils as utils
-import SmartControl.queries as queries
+import SMARTControl.utils as utils
+import SMARTControl.queries as queries
 
 
 
 def GetDivers (connection : sqlalchemy.engine.base.Connection):
     '''
+    Get all the divers from https://sensors.inowas.com/list
     
     Parameters
     ----------

@@ -66,58 +66,51 @@ Below, a brief description of each python module and its classes and functions i
 	* If executed and .db is non existent, it creates a database
 2.	**queries.py**
 	* Get : instance class to retrieve data. The methods below are currently available:
-		* *APIDate*
-		* *CheckDuplicateEntry*
-		* *DiverData*
-		* *DiverStatus*
-		* *HydroProfile*
-		* *Isolines*
-		* *LongTimeSeries*
-		* *ShortTimeSeries*
-		* *MonitoringPointData*
-		* *SartEndDate*
-		* *Table*
-		* *UpdateID*
-		* *VariableID*
+		* *APIDate*: Function to get the last date in the database and pass it as a searching mechanism to retrieve the API. It returns the first date and the first timestamp to search in the API.
+		* *CheckDuplicateEntry* : it checks duplicate entries in the PointsMeasurements table and drop these values. It returns a dataframe with less or equal number of rows than the input frame.
+		* *DiverData*: get class method to retrieve sensor data. It returns a dataframe to merge well and diver data.
+		* *DiverStatus*: it returns a dataframe joining divers, wells, drills and the current status with regards to the divers' last update.
+		* *HydroProfile*: long query for the hydrogeological profiles. They can be index by drill.
+		* *Isolines*:•	query used to retrieve monitoring data for a given variable and time.
+		* *LongTimeSeries*: Long query for the PointsMeasurements. The resultant query is stored in a pandas.core.frame.DataFrame format as a class attribute.
+		* *ShortTimeSeries*: query for the PointsMeasurements per well. The resultant query is stored in a pandas.core.frame.DataFrame format as a class attribute.
+		* *MonitoringPointData*: function to retrieve information about all the monitoring points.
+		* *SartEndDate*: Function to get the start and end date of the database
+		* *Table*: it retrieves the entire raw table from database
+		* *UpdateID*: get the last update from the PointsMeasurements table
+		* *VariableID*: it returns the ID of a specific variable as integer.
 3. **utils.py**
 	* **Dashboard map plotting capabilities**:
-		* *arrow_head*
-		* *Folium_arrows*
-		* *Folium_contour*
-		* *Folium_map*
+		* *arrow_head*: function to create arrow heads based on coordinates, gradient and a scale standard parameter. It returns a dataframe with information with geometric information of arrow heads.
+		* *Folium_arrows*: it creates a Folium field of arrows.
+		* *Folium_contour*: it creates a Folium contour map.
+		* *Folium_map*: it creates a Folium map centered in the region of interest.
 	* **Workflow**
-		* *Gradient*
-		* *InterpolationGradient*
-		* *BoundaryCondition*
-		* *CompleteMissingDates*
-		* *ControlPoints*
-		* *DbCon*
-		* *TimeToString*
-		* *GetMonitoringPointData*
-		* *GetDivers*
-		* *GetDiverData*
-		* *CompleteMissingDates*
-		* *Process*
-		* *GetVariableID*
-		* *Process*
-		* *prepare_query*
-		* *PrepareIsolines
+		* *InterpolationGradient*: class method to interpolate data the Scipy cubic method and find the gradient of the potentiometric surface. 
+		* *BoundaryCondition*: function to add the river head boundary to the Isolines query before interpolating data. It basically uses spreads across boundary points the value read in the river gage.
+		* *CompleteMissingDates*: fill time gaps with numpy.nan data for hourly data from unix time stamp column.
+		* *ControlPoints*: function to distribute fictious points in the river border and interpolate the levels.
+		* *DbCon*: function that returns important variables to connect to the database using sqlalchemy.
+		* *TimeToString*: convert pandas timestamp to string to be passed into the pegel API.
+		* *Process*: function that process the input dataframe and prepare it to be appended to the PointsMeasurements table.  It first deploys the checkDuplicateEntry function and checks if there is any duplicate entry , and then deploys the CompleteMissingDates function to fill gaps with numpy.nan.
+		* *prepare_query*: function to further process the Get.Isolines method and screen out values that should not be used in the PrepareIsolines function.
+
 	* **Management of database**
-		* *FixOutliers*
-		* *FixValueByDate*
+		* *FixOutliers*:  function to reset outliers based on threshold. From quick analysis, when the diver depth is 12.4 in the Pirna Test site. The best is threshold is 108. The ouliers are values below what is expect and are obtained when the divers are exposed to the atmospheric pressure. In other words, when they are removed from the well and the reading is transmitted to the database.
+		* *FixValueByDate*: function to replace value to null using date interval.
 		
 			
-4. **api.py**: a module to access APIs that hinges on two classes. Internal dependencies are: SmartControl.utils and SmartControl.queries.
-	* *Inowas*
-	* *PegelAlarm*
-	* Both classes count on the Request method to access the api data after fetching preliminary information in the 'database.db' file.
+4. **api.py**: a module to access APIs that hinges on two classes. Internal dependencies are: SmartControl.utils and SmartControl.queries. Both classes count on the Request method to access the api data after fetching preliminary information in the 'database.db' file.
+	* *GetDivers*: function to get all the divers from https://sensors.inowas.com/list and merge it with the database information.
+	* *Inowas* and *PegelAlarm*: instance classes with and __init__ method that produces an URL to retrieve data from the APIs using the last update in the database. 
+		* *Request*: classes' method to request a json file and produce a dataframe compatible with the database. 
 
 5. **update.py**: a module to wrangle the APIs' to input it into the database. It fetches information about the database and deploy the utils to automate the task.
 	* *Internal dependencies*: SmartControl.utils, SmartControl.queries as queries
 		* *Functions*:
-			* *InowasLongAPItoSQL*: standalone function to update database form diver data.
-			* *SequenceUpdate*: Loop over diver's parameters to update the database according to the last date present in there.
 			* *Update*: Deployment of the SequenceUpdate as batch process
+			* *SequenceUpdate*: Loop over diver's parameters to update the database according to the last date present in there.
+			* *InowasLongAPItoSQL*: standalone function to update database form diver data.
 		* *Class and methods*:
 			* *RL*:
 				* *RiverAPItoSQL*: Method to prepare Pegel Alarm sensor data
