@@ -1,36 +1,54 @@
 import os
-import sys
 import time
-from datetime import timedelta, datetime
-import folium
-import numpy as np
+import sys 
 import pandas as pd
-
-import folium
-
+import geopandas as gpd
+import numpy as np
+import xarray as xr
+from datetime import datetime
+from datetime import timedelta
+from scipy.interpolate import griddata
 import panel as pn
-pn.extension('tabulator', sizing_mode='stretch_width')
+import bokeh
+pn.extension('tabulator', sizing_mode="stretch_width")
 
 import holoviews as hv
 import hvplot.pandas
-hv.extension('bokeh')
+import hvplot.xarray
+# hv.extension('bokeh')
 
-#Fetching Repo capabilities
-path = 'd:/repos/pirnacasestudy'
-sys.path.append('d:/repos/pirnacasestudy')
-import SmartControl as sc
+import colorcet as cc
+from colorcet.plotting import swatch, swatches
 
-#instantiating class to query the database
+import warnings
+warnings.filterwarnings('ignore')
+
+path = 'D:\Repos\PirnaCaseStudy'
+sys.path.append(path)
+import SMARTControl as sc
+
+
+'''
+
+Define Parameters
+
+'''
+
+height = 550
+min_width = 700
+max_width = 1400
+
 os.chdir(path)
-Get = sc.queries.Get('Data/database.db')
+database_fn = 'Data/Database.db'
+Get = sc.queries.Get(database_fn)
 
-
-MonitoringPointData_df = Get.MonitoringPointData(GageData = 1)
-GageData_df = Get.GageData
 
 '''
 Querying the database
 '''
+
+MonitoringPointData_df = Get.MonitoringPointData(GageData = 1)
+GageData_df = Get.GageData
 
 # First and last date
 start, end = Get.StartEndDate ()
@@ -49,32 +67,60 @@ r_df = Get.ShortTimeSeries_df.copy()
 r_df = r_df.set_index('Date')
 
 # Check if HydroPlot goes and add it here
+Get.HydroProfile()
+HydroProfile_df = Get.HydroProfile_df.copy()
+HydroProfile_df.columns = [
+    'ID', 'PointID', 'DrillName', 'TestType', 'Unit', 'Depth', 'DrillDepth','MonitoringPoint', 'Value', 'E', 'N'
+]
 
 
+'''
+
+Preparing Data for geological layers
+
+'''
+#handling log
+HydroProfile_df.Depth *= -1
+HydroProfile_df.Value = np.where(HydroProfile_df.Value < 0, 0, HydroProfile_df.Value)
+# HydroProfile_df.Value  = np.log10 (HydroProfile_df.Value)    
+
+plot_df = HydroProfile_df [
+    (HydroProfile_df.TestType.isin (['EC logs', 'DPIL']))
+].reset_index(drop = True)  
+
+#Dataframe of interpreted layers
+layers_df = pd.DataFrame({
+    "Drill"   : [
+        'D-G01', 'D-G02', 'D-G03', 'D-G05', 'D-G10', 'D-G11', 
+        'D-G12', 'D-G13', 'D-G15','D-G17', 'D-G19', 'D-G21'
+    ],
+    "Landfill": [-3.0, -3.0 ,-3.0 ,-3.0 ,-3.0 , 0.0,  0.0,  0.0 , 0.0,  0.0,  0.0,  0.0],
+    "Layer 1": [-3.7, -3.7,- 3.8, -4.0, -2.9, -4.0, -4.3, -3.5, -4.0, -4.2, -4.0, -3.9],
+    "Layer 2": [-2.2, -3.1, -3.2, -3.3, -4.8, -4.0, -3.0, -3.8, -3.7, -3.3, -3.1, -2.9],
+    "Layer 3": [-3.1, -3.2, -2.9, -2.9, -2.2, -4.1, -4.6, -4.8, -4.5, -4.0, -4.7, -3.4],
+    "Layer 4": [-2.0, -1.0, -1.1, -0.8, -1.1, -1.9, -2.1, -1.9, -1.8, -2.5, -2.2, -0.0]})
+    
 '''
 
 Widgets
 
 '''
-wells_list = list(df.Name.unique())
-wells_wid = pn.widgets.Select (name = 'Well', options = wells_list, value = wells_list[0])
 
-
-
-wells_df = MonitoringPointData_df.copy()
-wells_df = wells_df.iloc[:,1:] [ wells_df['Type'] == 'Well']
-# wells_df['Lon'], wells_df ['Lat'] = hv.util.transform.lon_lat_to_easting_northing(wells_df.E, wells_df.N)    
-
-
-
-
-# var_wid = pn.widgets.Select(name='Variable', options = list(Variables_df.Description))
-
+#Map
 value = end - timedelta(days=2) 
 date_wid = pn.widgets.DatetimePicker(name='Date and time', start=start , end = end, value = value)
 scalearrows_wid = pn.widgets.IntSlider(start = 10, end = 500 , step = 20, value = 250,
                                       name='Sizing arrows'
                                       )
+
+
+#Scatter
+wells_list = list(df.Name.unique())
+wells_wid = pn.widgets.Select (name = 'Well', options = wells_list, value = wells_list[0])
+
+#HydroProfile
+drills_wid = pn.widgets.Select(name='Drill Name', options = list(HydroProfile_df.DrillName.unique()))
+
 
 
 '''
@@ -102,7 +148,6 @@ def iTS (wells_wid):
 
 iBindTS = hvplot.bind(iTS, wells_wid).interactive()
 
-
 iScatterTS = iBindTS.hvplot.scatter(
     x = 'Date', y = 'Value',
     label = 'Diver Data',
@@ -125,6 +170,7 @@ scatter_rg = gr_df.hvplot.scatter(
                                 )
 
 iScatterTS =  scatter_rg *iScatterTS
+
 
 '''
 
@@ -175,7 +221,7 @@ def iPlot (date_wid, scalearrows_wid):
         # arrows_df
         Map = sc.utils.Folium_arrows(Map_contour , df )
 
-        return pn.pane.plot.Folium(Map, height = 690,
+        return pn.pane.plot.Folium(Map, height = height,
                                    
                                   )
     
@@ -185,7 +231,76 @@ def iPlot (date_wid, scalearrows_wid):
 
 iMap = pn.bind(iPlot, date_wid, scalearrows_wid)
 
+'''
 
+Aquifer Characterization
+
+'''
+
+
+def iHPV(drills_wid):
+    df =  plot_df [
+        (plot_df.DrillName == drills_wid)
+    ].reset_index(drop = True)  
+        
+    if df.shape[0] == 0:
+        md=  pn.pane.Markdown ('''
+        ### <center>No data for this drill</center>
+        <br>
+        ''',align = 'center', style = {'font-size' : '1.5em'})
+        
+        return pn.Row(md, width = 600)
+    else:
+        df = df.replace(['EC logs', 'DPIL'], ['EC [mS/m]', 'Kr-DPIL[l/h*bar]'])
+        df = df.rename (columns = {"TestType" : "Variable"})
+        
+        iLineHP = df.hvplot.line(
+            x = 'Value',
+            y = 'Depth',
+            by = 'Variable',
+            alpha = 1,
+            logx = True,
+            grid = True,
+            ylabel = 'Depth (m)', 
+            xlabel = 'Log',
+            legend = True,
+            ylim = [df.Depth.min() - 2,1],
+            height = height,
+            width = 600
+    )
+
+        return iLineHP
+
+    
+#function for hydro stratigraphic layer
+def iHPL(drills_wid): 
+    
+    df =  plot_df [
+        (plot_df.DrillName == drills_wid)
+    ].reset_index(drop = True)  
+
+    df_ = layers_df [
+        (layers_df.Drill== drills_wid)
+    ].reset_index(drop = True)  
+
+    #dropping columns that contain zero - getting rid of the layers that do not have landfills
+    df_ = df_.loc [:,(df_ != 0).any(axis=0) ]
+
+    iBarHP = df_.hvplot.bar(
+        x        = 'Drill',
+        stacked  = True,
+        xlim = [0,4],
+        ylim = [df.Depth.min() - 2,1],
+        color    = ['#ED7D31', '#FFC000', '#70AD47', '#9E480E', '#997300'],
+        height   = height,
+        width = 200,
+        xlabel = ''
+    )
+    return iBarHP    
+
+
+iLineHP = pn.bind(iHPV, drills_wid)
+iBarHP = pn.bind(iHPL, drills_wid)
 
 
 '''
@@ -194,35 +309,71 @@ Dashboard
 app
 
 '''
-
-
-
-
-Row1 = pn.Row(date_wid , scalearrows_wid)
-Row2 = pn.Row(iMap)
-iMap_col = pn.Column(Row1, Row2,
-                    height_policy = 'fit',
-                    sizing_mode = 'stretch_width',
-                    )
-                    
-  # Header
+# Header
 Inowas_fn = 'Figures/INOWAS.jpg'
 SMARTControl_fn = 'Figures/SmartControl.png'
 dashboard_title = pn.panel('## SMART-Control')
-col1_r1 = pn.Column(pn.pane.JPG(Inowas_fn, height=40))
-col2_r1 = pn.Column(pn.pane.PNG('Figures/SmartControl.png', height=40))
+header_c1 = pn.Column(pn.pane.JPG(Inowas_fn, height=40))
+header_c2 = pn.Column(pn.pane.PNG('Figures/SmartControl.png', height=40))
+
+header_r1 = pn.Row(
+    header_c1,
+    pn.Spacer(width=450),
+    header_c2,
+    background='aqua',
+    height = 50,
+    height_policy = 'fixed',
+    sizing_mode = 'stretch_width',
+    min_width = min_width,
+    max_width = max_width
+              )
+
+## Elements
+
+### Map
+Map_r1 = pn.Row(date_wid , scalearrows_wid)
+Map_r2 = pn.Row(iMap)
+Map_c = pn.Column(
+    Map_r1, Map_r2,
+    height_policy = 'fit',
+    sizing_mode = 'stretch_width',
+    min_width = min_width,
+    max_width = max_width
+                    )
+
+# Map_c.show()
+
+### Time Series
+TS_c = pn.Column (
+    iScatterTS,
+    height_policy = 'fit',
+    sizing_mode = 'stretch_width',
+    min_width = min_width,
+    max_width = max_width)
 
 
-row1 = pn.Row(col1_r1, pn.Spacer(width=450),
-              col2_r1,  background='aqua',
-              height = 50, height_policy = 'fixed',
-              sizing_mode = 'stretch_width',
-              ) #top, right, bottom, left in pxls col3_r1, margin=(0, 100, 0, -5),
+### Aquifer characterization  (AC)
+AC_r1 = pn.Row (drills_wid)
+AC_r2 = pn.Row(
+    pn.layout.HSpacer(width = 200), 
+    pn.Row(iLineHP,  max_width = 500, min_width = 600),
+    pn.Row (iBarHP,  max_width = 200),
+    pn.layout.HSpacer(width = 200), 
+    min_width = min_width,
+    max_width = max_width
+)
+
+AC_c = pn.Column (AC_r1,AC_r2)
+
+AC_c = pn.Column (AC_r1,AC_r2)
+# AC_c.show()
 
 #Tabs
-row2 = pn.Tabs (('Map', iMap_col) ,
-                ('Scatter', iScatterTS), 
-                sizing_mode = 'stretch_both'
+body_r2 = pn.Tabs (('Map', Map_c) ,
+                   ('Scatter', TS_c), 
+                   ('Hydrostratigraphy', AC_c),
+                   height_policy = 'fit',
+#                    max_height = 700
                 )
 
 
@@ -238,16 +389,16 @@ col3_r3 = pn.Column(pn.pane.PNG('Figures/PegelAlarm.png', height=40))
 col4_r3 = pn.Column(pn.pane.PNG(TUDresden_fn, height=40))
 
 
-row3 = pn.Row(
+bottom_r3 = pn.Row(
     col1_r3, col2_r3 , col3_r3, col4_r3, 
     background='turquoise',
-    height = 50, height_policy = 'fixed',
-    sizing_mode = 'stretch_width' 
-              )
+    height = 50,
+    min_width = min_width,
+    max_width = max_width
+)
 
+dashboard = pn.Column(header_r1 ,body_r2, bottom_r3)
+# dashboard = pn.Column(bottom_r3)
 
-
-
-dashboard = pn.Column(row1 ,row2, row3)
 
 dashboard.show()

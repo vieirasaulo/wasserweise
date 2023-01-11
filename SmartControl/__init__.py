@@ -5,13 +5,12 @@ All of the functionalities and packages that operate under the hoot will be impo
 
 # from InputDatabase import *
 
-# from SmartControl import Functions
-# from SmartControl import CreateDatabase
-# from SmartControl.queries import *
-import SmartControl.CreateDatabase
-import SmartControl.api 
-import SmartControl.utils 
-import SmartControl.queries
-import SmartControl.update
+# from SMARTControl import Functions
+# from SMARTControl import CreateDatabase
+# from SMARTControl.queries import *
+import SMARTControl.api 
+import SMARTControl.utils 
+import SMARTControl.queries
+import SMARTControl.update
 
 

@@ -404,7 +404,7 @@ text =  pn.pane.Markdown ('''
 
 
 
-def prepare_query (Get_ : SMARTControl.queries.Get, date_wid , crs_gcs = 4326: int):
+def prepare_query (Get_ : SMARTControl.queries.Get, date_wid , crs_gcs : int = 4326):
     '''
     Function to interpolate data the cubic method and find the gradient of the potentiometric surface. 
 
@@ -471,7 +471,7 @@ def prepare_query (Get_ : SMARTControl.queries.Get, date_wid , crs_gcs = 4326: i
         
 
 
-def Interpolation_Gradient (map_gdf : gpd.geodataframe.GeoDataFrame , crs_utm = 25833 : int , pixel_size = 20 : int):
+def Interpolation_Gradient (map_gdf : gpd.geodataframe.GeoDataFrame , crs_utm : int = 25833, pixel_size : int = 20):
     '''
     Function to interpolate data the cubic method and find the gradient of the potentiometric surface. 
 
