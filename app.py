@@ -1,24 +1,14 @@
 import os
-import time
 import sys 
 import pandas as pd
-import geopandas as gpd
 import numpy as np
-import xarray as xr
-from datetime import datetime
 from datetime import timedelta
-from scipy.interpolate import griddata
 import panel as pn
-import bokeh
+import holoviews as hv
 pn.extension('tabulator', sizing_mode="stretch_width")
 
-import holoviews as hv
 import hvplot.pandas
-import hvplot.xarray
 # hv.extension('bokeh')
-
-import colorcet as cc
-from colorcet.plotting import swatch, swatches
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -34,7 +24,7 @@ Define Parameters
 
 '''
 
-height = 600
+height = 580
 min_width = 700
 max_width = 1400
 
@@ -109,8 +99,9 @@ Widgets
 #Map
 value = end - timedelta(days=2) 
 date_wid = pn.widgets.DatetimePicker(name='Date and time', start=start , end = end, value = value)
-scalearrows_wid = pn.widgets.IntSlider(start = 10, end = 500 , step = 20, value = 250,
-                                      name='Sizing arrows'
+scalearrows_wid = pn.widgets.IntSlider(
+    start = 1, end = 100 , step = 1, value = 10,
+    name='Sizing arrows'
                                       )
 
 
@@ -137,39 +128,86 @@ g_df = pd.concat ([g_df, gr_df])
 
 
 
+# def iTS (wells_wid):
+
+#     g1_df = g_df [
+#         g_df.Name == wells_wid
+#     ].reset_index(drop = True)  
+    
+    
+#     return g1_df
+
+# iBindTS = hvplot.bind(iTS, wells_wid).interactive()
+
+# iScatterTS = iBindTS.hvplot.scatter(
+#     x = 'Date', y = 'Value',
+#     label = 'Diver Data',
+#     # width = max_width,
+#     alpha = 0.4, grid = True, size = 50,
+#     ylabel = 'Hydraulic head (m)', xlabel = 'Time',
+#     color = 'aqua', legend = True,
+#                             )
+
+# scatter_rg = gr_df.hvplot.scatter(
+#     x='Date', y='Value',
+#     ylabel = '[m]',
+#     xlabel = 'Date', 
+#     size = 50, 
+#     # width = max_width,
+#     height =500,
+#     color = 'green',
+#     label = "River Data",
+#     alpha = 0.4, grid = True,
+#     clabel = 'River head'
+#     )
+
+# iScatterTS =  scatter_rg * iScatterTS
+
 def iTS (wells_wid):
 
     g1_df = g_df [
         g_df.Name == wells_wid
     ].reset_index(drop = True)  
     
+    maxy , miny = 115, 107
+    iScatterTS = g1_df.hvplot.scatter(
+        
+        x = 'Date', y = 'Value',
+        label = 'Diver Data',
+        # width = max_width,
+        alpha = 0.4,
+        grid = True, 
+        size = 50,
+        ylabel = 'Hydraulic head (m)', 
+        xlabel = 'Time',
+        color = 'aqua',
+        legend = True,
+        ylim= ( miny , maxy)
+        
+        )
     
-    return g1_df
+    scatter_rg = gr_df.hvplot.scatter(
+        
+        x='Date', y='Value',
+        ylabel = '[m]',
+        xlabel = 'Date', 
+        size = 50, 
+        # width = max_width,
+        height = 500,
+        color = 'green',
+        label = "River Data",
+        alpha = 0.4, grid = True,
+        clabel = 'River head',
+        ylim= ( miny , maxy)
+        )
+    
+    iScatterTS =  scatter_rg * iScatterTS
+    
+    return iScatterTS
 
-iBindTS = hvplot.bind(iTS, wells_wid).interactive()
+iScatterTS = pn.bind(iTS, wells_wid)
 
-iScatterTS = iBindTS.hvplot.scatter(
-    x = 'Date', y = 'Value',
-    label = 'Diver Data',
-    width = 1400, alpha = 0.4, grid = True, size = 50,
-    ylabel = 'Hydraulic head (m)', xlabel = 'Time',
-    color = 'aqua', legend = True,
-                            )
-
-scatter_rg = gr_df.hvplot.scatter(
-    x='Date', y='Value',
-    ylabel = '[m]',
-    xlabel = 'Date', 
-    size = 50, 
-    width = 1400,
-    height =500,
-    color = 'green',
-    label = "River Data",
-    alpha = 0.4, grid = True,
-    clabel = 'River head'
-                                )
-
-iScatterTS =  scatter_rg *iScatterTS
+# pn.Column(iBindTS).show()
 
 
 '''
@@ -285,18 +323,27 @@ def iHPL(drills_wid):
 
     #dropping columns that contain zero - getting rid of the layers that do not have landfills
     df_ = df_.loc [:,(df_ != 0).any(axis=0) ]
-
-    iBarHP = df_.hvplot.bar(
-        x        = 'Drill',
-        stacked  = True,
-        xlim = [0,4],
-        ylim = [df.Depth.min() - 2,1],
-        color    = ['#ED7D31', '#FFC000', '#70AD47', '#9E480E', '#997300'],
-        height   = height,
-        width = 200,
-        xlabel = ''
-    )
-    return iBarHP    
+    
+    if df_.shape[0] == 0:
+        md=  pn.pane.Markdown ('''
+        ### <center>No data for this drill</center>
+        <br>
+        ''',align = 'center', style = {'font-size' : '1.5em'})
+        
+        return pn.Row(md, width = 600)
+    
+    else:
+        iBarHP = df_.hvplot.bar(
+            x        = 'Drill',
+            stacked  = True,
+            xlim = [0,4],
+            ylim = [df.Depth.min() - 2,1],
+            color    = ['#ED7D31', '#FFC000', '#70AD47', '#9E480E', '#997300'],
+            height   = height,
+            width = 200,
+            xlabel = ''
+        )
+        return iBarHP    
 
 
 iLineHP = pn.bind(iHPV, drills_wid)
@@ -310,13 +357,13 @@ app
 
 '''
 # Header
-Inowas_fn = 'Figures/INOWAS.jpg'
+Inowas_fn = 'Figures/INOWASV1.png'
 SMARTControl_fn = 'Figures/SmartControl.png'
 dashboard_title = pn.panel('## SMART-Control')
-header_c1 = pn.Column(pn.pane.JPG(Inowas_fn, height=40))
+header_c1 = pn.Column(pn.pane.PNG(Inowas_fn, height=40))
 header_c2 = pn.Column(pn.pane.PNG('Figures/SmartControl.png', height=40))
 
-header_r1 = pn.Row(
+header = pn.Row(
     header_c1,
     pn.Spacer(width=450),
     header_c2,
@@ -344,13 +391,17 @@ Map_c = pn.Column(
 # Map_c.show()
 
 ### Time Series
+TS_r1 = pn.Row (wells_wid)
+TS_r2 = pn.Column (iScatterTS)
+
+
 TS_c = pn.Column (
-    iScatterTS,
+    TS_r1, TS_r2,
     height_policy = 'fit',
     sizing_mode = 'stretch_width',
     min_width = min_width,
-    max_width = max_width)
-
+    max_width = max_width
+    )
 
 ### Aquifer characterization  (AC)
 AC_r1 = pn.Row (drills_wid)
@@ -363,33 +414,35 @@ AC_r2 = pn.Row(
     max_width = max_width
 )
 
-AC_c = pn.Column (AC_r1,AC_r2)
+AC_c = pn.Column (AC_r1,AC_r2,
+                  min_width = min_width, 
+                  max_width = max_width
+                  )
 
-AC_c = pn.Column (AC_r1,AC_r2)
-# AC_c.show()
 
 #Tabs
-body_r2 = pn.Tabs (('Map', Map_c) ,
-                   ('Scatter', TS_c), 
-                   ('Hydrostratigraphy', AC_c),
-                   height_policy = 'fit',
-#                    max_height = height
-                )
+body = pn.Tabs (
+    ('Groundwater Flow', Map_c) ,
+    ('Hydrostratigraphy', AC_c), 
+    ('Time series', TS_c),
+    )
+
+    
 
 
 #Bottom
-Groundwatch_fn = 'Figures/Groundwatch.png'
+Groundwatch_fn = 'Figures/Groundwatchv1.png'
 Python_fn = 'Figures/Python-logo-notext.png'
-PegelAlarm_fn = 'Figures/INOWAS.jpg'
+PegelAlarm_fn = 'Figures/PegelAlarm.png'
 TUDresden_fn = 'Figures/TuDresden.png'
 
 col1_r3 = pn.Column(pn.pane.PNG(Groundwatch_fn, height=40))
 col2_r3 = pn.Column(pn.pane.PNG(Python_fn, height=40))
-col3_r3 = pn.Column(pn.pane.PNG('Figures/PegelAlarm.png', height=40))
+col3_r3 = pn.Column(pn.pane.PNG(PegelAlarm_fn, height=40))
 col4_r3 = pn.Column(pn.pane.PNG(TUDresden_fn, height=40))
 
 
-bottom_r3 = pn.Row(
+bottom = pn.Row(
     col1_r3, col2_r3 , col3_r3, col4_r3, 
     background='turquoise',
     height = 50,
@@ -397,8 +450,9 @@ bottom_r3 = pn.Row(
     max_width = max_width
 )
 
-dashboard = pn.Column(header_r1 ,body_r2, bottom_r3)
+dashboard = pn.Column(header ,body, bottom)
 # dashboard = pn.Column(bottom_r3)
 
 
 dashboard.show()
+# body_r2.show()

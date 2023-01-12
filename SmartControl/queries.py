@@ -1,10 +1,9 @@
 import time
 from datetime import timedelta
 import pandas as pd
-import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import SMARTControl.CreateDatabase as CreateDatabase
+import SMARTControl.CreateDatabase as CreateDataBase 
 
 class Get:
     def __init__ (self, database_fn : str):
@@ -29,12 +28,9 @@ class Get:
 
         engine = create_engine("sqlite:///{}".format(database_fn), echo = False) #False to not show the output
         connection = engine.connect()
-        Session = sessionmaker(bind = CreateDatabase.engine)
-        session = Session()
           
         self.engine = engine
         self.connection = connection
-        self.session = session
         
         '''
         store dataframes here
@@ -578,7 +574,7 @@ class Get:
                 v = DataFrame.groupby('MonitoringPointName').Value.mean().values
                 t = DataFrame.groupby('MonitoringPointName')['Time'].mean().values
                 df = DataFrame.drop_duplicates(subset = ['MonitoringPointID'])
-                df = df.drop(['MonitoringPointID', 'Time'], axis = 1)
+                df = df.drop(['Time'], axis = 1)
                 df['Value'] = v
                 df['Time'] = t
                 DataFrame = df.copy()

@@ -1,18 +1,14 @@
 import os
 import sys
-path = 'D:\\Repos\\PirnaCaseStudy'
-sys.path.append(path) #indicate the the repository is
-import SmartControl as sc
+import SMARTControl as sc
 import pandas as pd
 import numpy as np
 
 from sqlalchemy import MetaData, Table
 
-database_fn = 'Data/Database.db'
-os.chdir(path)
+database_fn = 'Database.db'
 
-
-Get = sc.queries.Get(database_fn) #instantiates the database 
+Get = sc.queries.Get(database_fn) #instantiates the Get class 
 
 # Get.MonitoringPointData()
 # df = Get.MonitoringPointData_df.copy()
@@ -27,9 +23,9 @@ TimeSeries
 
 # sc.utils.RemoveOutliers(Get, 108)
 
-Get.ShortTimeSeries(FilterVariableID = 0,
-                    FilterMonitoringPoint = 'G21neu')
-df = Get.ShortTimeSeries_df
+# Get.ShortTimeSeries(FilterVariableID = 0,
+#                     FilterMonitoringPoint = 'G21neu')
+# df = Get.ShortTimeSeries_df
 # arrows_df = df.copy()
 
 # min_ , max_ = 0, arrows_df.shape[0]
@@ -38,7 +34,7 @@ df = Get.ShortTimeSeries_df
 # # df = arrows_df.sample(n = sample_size).reset_index(drop = True)
 # df = arrows_df [arrows_df.index.isin(indexes)].reset_index(drop = True)
 
-df.plot('Date', 'Value', 'scatter', figsize = (20,10), alpha = 0.9)
+# df.plot('Date', 'Value', 'scatter', figsize = (20,10), alpha = 0.9)
 
 # df_ = df [df.Date.dt.hour.diff() > 1]
 

@@ -2,7 +2,6 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import numpy as np
-import SMARTControl.CreateDatabase as CreateDatabase
 import SMARTControl.queries 
 import holoviews as hv
 from scipy.interpolate import griddata
@@ -60,7 +59,7 @@ def DbCon (database_fn : str):
 
     engine = create_engine("sqlite:///{}".format(database_fn), echo = False) #False to not show the output
     connection = engine.connect()
-    Session = sessionmaker(bind = CreateDatabase.engine)
+    Session = sessionmaker(bind = engine)
     session = Session()
       
     return engine, connection, session
@@ -420,15 +419,26 @@ def prepare_query (Get_ : SMARTControl.queries.Get, date_wid , crs_gcs : int = 4
     map_gdf : geopandas.geodataframe.GeoDataFrame 
     river_gage_gdf : geopandas.geodataframe.GeoDataFrame 
     '''
-
     
+    if isinstance(date_wid, str):
             
-    Get_.Isolines(Year = pd.to_datetime(date_wid).year,
-                              Month = pd.to_datetime(date_wid).month,
-                              Day = pd.to_datetime(date_wid).day,
-                              Hour = pd.to_datetime(date_wid).hour)
-    
-    
+        Get_.Isolines(Year = pd.to_datetime(date_wid).year,
+                                  Month = pd.to_datetime(date_wid).month,
+                                  Day = pd.to_datetime(date_wid).day,
+                                  Hour = pd.to_datetime(date_wid).hour)
+    else:
+       try: 
+           Get_.Isolines(Year = date_wid.year,
+                         Month = date_wid.month,
+                         Day = date_wid.day,
+                         Hour = date_wid.hour)
+       except Exception:
+           Get_.Isolines(Year = date_wid.dt.year,
+                         Month = date_wid.dt.month,
+                         Day = date_wid.dt.day,
+                         Hour = date_wid.dt.hour)
+           
+       
     
     df = Get_.Isolines_df.copy()
     
@@ -528,10 +538,12 @@ def Interpolation_Gradient (map_gdf : gpd.geodataframe.GeoDataFrame , crs_utm : 
         grid_z_utm = griddata(points_utm, values, (grid_x_utm, grid_y_utm), method='cubic')
         
         # 2.5 calculating the gradient - only for utm
+        # the gradient is the hydraulic gradient for a given pixel size decomposed in u,v coords
         u, v = np.gradient(grid_z_utm, pixel_size)
         
         '''
-        Plotting
+        For Plotting it is necessary to multiply by minus 1
+        
         '''
         U =  - u 
         V =  - v 
@@ -546,7 +558,7 @@ def arrow_head(grid_x : np.ndarray,
                grid_z : np.ndarray,
                u : np.ndarray,
                v : np.ndarray ,
-               scale : int = 5e2
+               scale : int = 50
                  ):
     '''
     Function to create arrow heads based on coordinates, gradient and a scale standard parameter.
@@ -579,9 +591,10 @@ def arrow_head(grid_x : np.ndarray,
                             }
                           )
     
+        500 > 10
         
-        df ['head_x'] = df.x + df.u / scale
-        df ['head_y'] = df.y + df.v / scale
+        df ['head_x'] = df.x + df.u / 1e2 * scale
+        df ['head_y'] = df.y + df.v / 1e2 * scale
         
         df = df.dropna().reset_index(drop = True)
         
@@ -759,7 +772,7 @@ def Folium_arrows(m : folium.folium.Map, arrows_df : pd.core.frame.DataFrame, sa
                                         fill_color = 'black',
                                         fill_opacity = 1 ,
                                         number_of_sides = 3,
-                                        radius = 1,
+                                        radius = 2,
                                         rotation = df['rotation'][i]).add_to(m)
     
         return m
