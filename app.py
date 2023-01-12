@@ -34,7 +34,7 @@ Define Parameters
 
 '''
 
-height = 550
+height = 600
 min_width = 700
 max_width = 1400
 
@@ -373,7 +373,7 @@ body_r2 = pn.Tabs (('Map', Map_c) ,
                    ('Scatter', TS_c), 
                    ('Hydrostratigraphy', AC_c),
                    height_policy = 'fit',
-#                    max_height = 700
+#                    max_height = height
                 )
 
 
