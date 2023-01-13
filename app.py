@@ -1,5 +1,12 @@
-import os
 import sys 
+
+'''
+ignore __pycache__
+add path to repo
+'''
+sys.dont_write_bytecode = True
+
+import os
 import pandas as pd
 import numpy as np
 from datetime import timedelta
