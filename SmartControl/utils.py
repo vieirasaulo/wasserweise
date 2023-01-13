@@ -870,69 +870,10 @@ def HydraulicGradient (Get_ : SMARTControl.queries.Get , size : int = 2000):
         replace(':','-').\
             replace(' ','_')
 
-    fn = f'Data/PostProcessed/Vectors{dt}.csv'
+    fn = f'Data/PostProcessed/Vectors.csv'
     vectors_df.to_csv(fn, index = False)
     
     
     print('Total run time:',t1-t0, 'with {} exceptions'.format(n) )
     return dt
     
-if __name__ == '__main__':
-    os.chdir(repo.working_tree_dir)
-        
-    print(os.getcwd())
-    database_fn = 'Data/database.db'
-    Get = SMARTControl.queries.Get(database_fn)
-        
-
-    from git import Repo
-    
-
-
-    dt = HydraulicGradient (Get, size = 3)
-    
-    # g = Github(access_token)
-    # repo = g.get_user().get_repo('PirnaStudyCase')
-    
-    
-    # repo_dir = 'PirnaCaseStudy'
-    repo = Repo(os.getcwd())
-    
-    path = 'Data/PostProcessed/'
-    file_names = os.listdir('Data/PostProcessed/')
-    
-    file_list = [path + file for file in file_names]
-    
-    file = file_names[-1]
-    file_path = file_list[-1]
-    
-
-    commit_message = f'Database_LastUpdated-{dt}'
-    # repo.index.add(file_path)
-    # origin = repo.remote('origin')
-    # origin.push()
-    
-    # g = git.cmd.Git(repo)
-    # g.execute("git add .", env=os.environ)
-    
-    
-    # master_ref = repo.get_git_ref('heads/master')
-    # master_sha = master_ref.object.sha
-    # base_tree = repo.get_git_tree(master_sha)
-    
-    # element_list = list()
-
-    # with open(file_path) as input_file:
-    #     data = input_file.read()
-    # if file_path.endswith('.png'): # images must be encoded
-    #     data = base64.b64encode(data)
-            
-    #     element = InputGitTreeElement(file, '100644', 'blob', data)
-    #     element_list.append(element)
-
-    # # tree = repo.create_git_tree(element_list, base_tree)
-    # parent = repo.get_git_commit(master_sha)
-    # commit = repo.create_git_commit(commit_message, tree, [parent])
-    # master_ref.edit(commit.sha)
-        
-    # HydraulicGradient (Get, size = 3)
