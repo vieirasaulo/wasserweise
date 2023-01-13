@@ -52,7 +52,7 @@ file_path = file_list[-1]
 commit_message = f'Test_Database_LastUpdated-{dt}'
 
 
-repo.index.remove(file_path)
+repo.index.add(file_path)
 repo.git.commit( '-m', commit_message)
 
 
