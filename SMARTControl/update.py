@@ -39,8 +39,7 @@ import SMARTControl.queries
 
 
 import git
-from github import Github, InputGitTreeElement
-import base64
+from github import Github
 
 fn = 'LOG_UPDATE.txt' 
     
