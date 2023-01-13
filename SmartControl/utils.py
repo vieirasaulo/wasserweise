@@ -866,13 +866,16 @@ def HydraulicGradient (Get_ : SMARTControl.queries.Get , size : int = 2000):
         else:continue
     t1 = time.perf_counter()
     
-    dt = datetime.now()
+    dt = str(datetime.now()).\
+        replace(':','-').\
+            replace(' ','_')
 
-    fn = f'Data/PostProcessed/Vectors{dt.year}{dt.month}{dt.day}_{dt.hour}-{dt.minute}-{dt.second}.csv'
+    fn = f'Data/PostProcessed/Vectors{dt}.csv'
     vectors_df.to_csv(fn, index = False)
     
     
     print('Total run time:',t1-t0, 'with {} exceptions'.format(n) )
+    return dt
     
 if __name__ == '__main__':
     os.chdir(repo.working_tree_dir)
@@ -881,16 +884,12 @@ if __name__ == '__main__':
     database_fn = 'Data/database.db'
     Get = SMARTControl.queries.Get(database_fn)
         
-    import base64
-    from github import Github
-    from github import InputGitTreeElement
-    
+
     from git import Repo
     
-    # user = "saulo.vsfh@gmail.com"
-    # password = "ZWNK9hF3F6T%oq@EvLQ!H8mAj&!!C@"
-    
-    access_token = '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'
+
+
+    dt = HydraulicGradient (Get, size = 3)
     
     # g = Github(access_token)
     # repo = g.get_user().get_repo('PirnaStudyCase')
@@ -907,11 +906,14 @@ if __name__ == '__main__':
     file = file_names[-1]
     file_path = file_list[-1]
     
-    dt = datetime.now()
-    commit_message = f'Database_LastUpdated-{dt.year}{dt.month}{dt.day}_{dt.hour}-{dt.minute}-{dt.second}'
-    repo.index.add(file_path)
-    origin = repo.remote('origin')
-    origin.push()
+
+    commit_message = f'Database_LastUpdated-{dt}'
+    # repo.index.add(file_path)
+    # origin = repo.remote('origin')
+    # origin.push()
+    
+    # g = git.cmd.Git(repo)
+    # g.execute("git add .", env=os.environ)
     
     
     # master_ref = repo.get_git_ref('heads/master')
