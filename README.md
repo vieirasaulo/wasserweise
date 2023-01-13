@@ -39,8 +39,7 @@ Step-by-step on how to setup a python ecossystem and deploy this.
 		* Create a new environment and install the requirements (as of December 2022):
 			* Just type once you're in the folder:
 				* pip install -r requirements.txt
-				* Not available at the moment: conda create --name PirnaStudyCase --file spec-file.txt 
-				
+				* Not available at the moment: conda create --name PirnaStudyCase --file spec-file.txt 			
 4. Run the app:
 	* If you accomplish the steps above, type:
 		* python app.py
