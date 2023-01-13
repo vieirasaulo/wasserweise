@@ -1,4 +1,22 @@
-import os
+'''
+Module where the update function is written
+'''
+
+
+# '''
+# Enabling execution as __main__
+# '''
+# import os
+# os.environ["GIT_PYTHON_REFRESH"] = "quiet"
+# import git
+# repo = git.Repo('.', search_parent_directories=True)
+# os.chdir(repo.working_tree_dir)
+
+
+'''
+Importing modules and libraries
+'''
+
 import numpy as np
 import pandas as pd
 from datetime import datetime

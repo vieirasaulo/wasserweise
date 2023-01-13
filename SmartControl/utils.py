@@ -1,8 +1,28 @@
+'''
+Module where functions for the general functioning of the platform are hosted
+'''
+
+if __name__ == '__main__':
+    
+    '''
+    Enabling execution as __main__
+    '''
+    import os
+    os.environ["GIT_PYTHON_REFRESH"] = "quiet"
+    import git
+    repo = git.Repo('.', search_parent_directories=True)
+    os.chdir(repo.working_tree_dir)
+
+
+'''
+Importing modules and libraries
+'''
+
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import numpy as np
-import SMARTControl.queries 
+import SMARTControl.queries
 import holoviews as hv
 from scipy.interpolate import griddata
 import xarray as xr
@@ -14,6 +34,7 @@ import matplotlib.pyplot as plt
 import geojsoncontour
 import panel as pn
 from datetime import datetime
+import time
 
 def TimeToString (t: pd._libs.tslibs.timestamps.Timestamp):
     '''
@@ -122,7 +143,7 @@ def CompleteMissingDates (df: pd.core.frame.DataFrame ):
     
     return df
 
-def Process (df : pd.core.frame.DataFrame, Get_ ) :
+def Process (df : pd.core.frame.DataFrame, Get_ : SMARTControl.queries.Get) :
     '''
     Function that process the input dataframe and prepare it to be appended to the PointsMeasurements table.  It first deploys the CheckDuplicateEntry function and checks if there is any duplicate entry , and then deploys the CompleteMissingDates function to fill gaps with numpy.nan.
     
@@ -779,3 +800,137 @@ def Folium_arrows(m : folium.folium.Map, arrows_df : pd.core.frame.DataFrame, sa
     
     except ValueError:
         return text
+    
+def HydraulicGradient (Get_ : SMARTControl.queries.Get , size : int = 2000):
+    
+    '''
+    Function that process calculates and exports the hydraulic gradient for a pre-determined number of samples.
+    
+    Parameters
+    ----------
+    Get_ : SMARTControl.queries.Get
+    size : int
+        Number of random elements that will be sampled from the timeseries
+
+    Returns
+    -------
+    df : pd.core.frame.DataFrame
+        object with vectors coordinates
+    '''
+    
+    
+    start, end = Get_.StartEndDate(limit = 1)
+
+    times1 = pd.date_range(start = start, end= '2016-10-30', freq = '1H')
+    times2 = pd.date_range(start = '2019-05-30', end= end, freq = '1H')
+    
+    times= pd.Series(np.append(times1, times2))
+    times_sample = times.sample(n=size, random_state=6)
+    t0 = time.perf_counter()
+    
+    n = 0
+    i = 0
+       
+    vectors_df = pd.DataFrame()
+    
+    for t in times_sample:
+        Get_.Isolines(t.year, t.month, t.day, t.hour)
+        if Get_.Isolines_df.shape[0] > 3:
+            
+            try: 
+                
+                map_gdf, river_gage_gdf = prepare_query (Get_, date_wid = t)
+                grid_x , grid_y , grid_z, U , V = Interpolation_Gradient(map_gdf , crs_utm = 25833 , pixel_size = 10)
+                
+                
+                df = arrow_head(grid_x , grid_y , grid_z , U , V).\
+                    drop(['head_x', 'head_y', 'h', 'rotation'], axis=1).\
+                        round(6)
+                
+                df = pd.DataFrame ( {
+                    'x' : np.ravel(grid_x),
+                    'y' : np.ravel(grid_y), 
+                    'u' : np.ravel(U),
+                    'v' : np.ravel(V)                
+                    } ).round(6).dropna().reset_index(drop = True)
+        
+                    
+                vectors_df = pd.concat([vectors_df, df])
+                i+=1
+            except Exception:
+               n+=1
+               continue
+            
+            if i%100 == 0:
+                print(i)
+        else:continue
+    t1 = time.perf_counter()
+    
+    dt = datetime.now()
+
+    fn = f'Data/PostProcessed/Vectors{dt.year}{dt.month}{dt.day}_{dt.hour}-{dt.minute}-{dt.second}.csv'
+    vectors_df.to_csv(fn, index = False)
+    
+    
+    print('Total run time:',t1-t0, 'with {} exceptions'.format(n) )
+    
+if __name__ == '__main__':
+    os.chdir(repo.working_tree_dir)
+        
+    print(os.getcwd())
+    database_fn = 'Data/database.db'
+    Get = SMARTControl.queries.Get(database_fn)
+        
+    import base64
+    from github import Github
+    from github import InputGitTreeElement
+    
+    from git import Repo
+    
+    # user = "saulo.vsfh@gmail.com"
+    # password = "ZWNK9hF3F6T%oq@EvLQ!H8mAj&!!C@"
+    
+    access_token = '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'
+    
+    # g = Github(access_token)
+    # repo = g.get_user().get_repo('PirnaStudyCase')
+    
+    
+    # repo_dir = 'PirnaCaseStudy'
+    repo = Repo(os.getcwd())
+    
+    path = 'Data/PostProcessed/'
+    file_names = os.listdir('Data/PostProcessed/')
+    
+    file_list = [path + file for file in file_names]
+    
+    file = file_names[-1]
+    file_path = file_list[-1]
+    
+    dt = datetime.now()
+    commit_message = f'Database_LastUpdated-{dt.year}{dt.month}{dt.day}_{dt.hour}-{dt.minute}-{dt.second}'
+    repo.index.add(file_path)
+    origin = repo.remote('origin')
+    origin.push()
+    
+    
+    # master_ref = repo.get_git_ref('heads/master')
+    # master_sha = master_ref.object.sha
+    # base_tree = repo.get_git_tree(master_sha)
+    
+    # element_list = list()
+
+    # with open(file_path) as input_file:
+    #     data = input_file.read()
+    # if file_path.endswith('.png'): # images must be encoded
+    #     data = base64.b64encode(data)
+            
+    #     element = InputGitTreeElement(file, '100644', 'blob', data)
+    #     element_list.append(element)
+
+    # # tree = repo.create_git_tree(element_list, base_tree)
+    # parent = repo.get_git_commit(master_sha)
+    # commit = repo.create_git_commit(commit_message, tree, [parent])
+    # master_ref.edit(commit.sha)
+        
+    # HydraulicGradient (Get, size = 3)

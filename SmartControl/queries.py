@@ -1,3 +1,22 @@
+'''
+Module where the Get class and the queries are written
+'''
+
+
+# '''
+# Enabling execution as __main__
+# '''
+# import os
+# os.environ["GIT_PYTHON_REFRESH"] = "quiet"
+# import git
+# repo = git.Repo('.', search_parent_directories=True)
+# os.chdir(repo.working_tree_dir)
+
+
+'''
+Importing modules and libraries
+'''
+
 import time
 from datetime import timedelta
 import pandas as pd

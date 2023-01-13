@@ -4,11 +4,8 @@ import pandas as pd
 import numpy as np
 from datetime import timedelta
 import panel as pn
-import holoviews as hv
 pn.extension('tabulator', sizing_mode="stretch_width")
-
 import hvplot.pandas
-# hv.extension('bokeh')
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -357,11 +354,11 @@ app
 
 '''
 # Header
-Inowas_fn = 'Figures/INOWASV1.png'
-SMARTControl_fn = 'Figures/SmartControl.png'
+Inowas_fn = 'Assets/INOWASV1.png'
+SMARTControl_fn = 'Assets/SmartControl.png'
 dashboard_title = pn.panel('## SMART-Control')
 header_c1 = pn.Column(pn.pane.PNG(Inowas_fn, height=40))
-header_c2 = pn.Column(pn.pane.PNG('Figures/SmartControl.png', height=40))
+header_c2 = pn.Column(pn.pane.PNG('Assets/SmartControl.png', height=40))
 
 header = pn.Row(
     header_c1,
@@ -431,10 +428,10 @@ body = pn.Tabs (
 
 
 #Bottom
-Groundwatch_fn = 'Figures/Groundwatchv1.png'
-Python_fn = 'Figures/Python-logo-notext.png'
-PegelAlarm_fn = 'Figures/PegelAlarm.png'
-TUDresden_fn = 'Figures/TuDresden.png'
+Groundwatch_fn = 'Assets/Groundwatchv1.png'
+Python_fn = 'Assets/Python-logo-notext.png'
+PegelAlarm_fn = 'Assets/PegelAlarm.png'
+TUDresden_fn = 'Assets/TuDresden.png'
 
 col1_r3 = pn.Column(pn.pane.PNG(Groundwatch_fn, height=40))
 col2_r3 = pn.Column(pn.pane.PNG(Python_fn, height=40))

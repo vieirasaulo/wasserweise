@@ -8,4 +8,3 @@ import SMARTControl.utils
 import SMARTControl.queries
 import SMARTControl.update
 
-
