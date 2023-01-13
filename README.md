@@ -1,5 +1,5 @@
 # PirnaStudyCase
-Study case developed with Nicolás Salazar and Claudia Montecinos to investigate the groundwater flow system in Pirna - Sachsen, Deutschland.
+Study case developed by Saulo Vieira da Silva Filho, Nicolás Salazar and Claudia Montecinos to investigate the groundwater flow system in Pirna - Sachsen, Deutschland.
 
 **SMARTControl** was developed to handle sensor's data. The database is currently being stored locally in the file 'Data/database.db'. The package also encompasses functionalities to process real-time data and visualize it as a dashboard. **SMARTControl** is a high-level tool developed specifically to targetthe needs of the project. Therefore, with the functionalities here present, it will not be possible to adapt it to your workflow without changing slightly the source code. However, the functionalities are relatively well documented, easy to understand and dependent on widely-used python packages.
 
