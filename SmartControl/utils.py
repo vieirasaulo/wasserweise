@@ -2,16 +2,16 @@
 Module where functions for the general functioning of the platform are hosted
 '''
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     
-    '''
-    Enabling execution as __main__
-    '''
-    import os
-    os.environ["GIT_PYTHON_REFRESH"] = "quiet"
-    import git
-    repo = git.Repo('.', search_parent_directories=True)
-    os.chdir(repo.working_tree_dir)
+#     '''
+#     Enabling execution as __main__
+#     '''
+#     import os
+#     os.environ["GIT_PYTHON_REFRESH"] = "quiet"
+#     import git
+#     repo = git.Repo('.', search_parent_directories=True)
+#     os.chdir(repo.working_tree_dir)
 
 
 '''
