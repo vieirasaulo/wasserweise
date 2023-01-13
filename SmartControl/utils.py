@@ -825,7 +825,7 @@ def HydraulicGradient (Get_ : SMARTControl.queries.Get , size : int = 2000):
     times2 = pd.date_range(start = '2019-05-30', end= end, freq = '1H')
     
     times= pd.Series(np.append(times1, times2))
-    times_sample = times.sample(n=size, random_state=6)
+    times_sample = times.sample(n=size)
     t0 = time.perf_counter()
     
     n = 0
