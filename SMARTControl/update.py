@@ -217,7 +217,7 @@ if __name__ == '__main__':
         replace(':','-').\
             split('.')[0]
 
-    commit_message = f'Test_Database_LastUpdated-{dt}'
+    commit_message = f'Database_LastUpdated-{dt}'
     for i in range(len(database_list)):
         repo.index.add(database_list[i])
         repo.git.commit( '-m', commit_message)
