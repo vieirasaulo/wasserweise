@@ -4,6 +4,24 @@ Study case developed by Saulo Vieira da Silva Filho, Nicolás Salazar and Claudi
 **SMARTControl** was developed to handle sensor's data. The database is currently being stored locally in the file 'Data/database.db'. The package also encompasses functionalities to process real-time data and visualize it as a dashboard. **SMARTControl** is a high-level tool developed specifically to targetthe needs of the project. Therefore, with the functionalities here present, it will not be possible to adapt it to your workflow without changing slightly the source code. However, the functionalities are relatively well documented, easy to understand and dependent on widely-used python packages.
 
 
+## Current status
+
+**This is an alpha version of an update app at a very early stage.**
+* Important information about it
+	1. Source of data: PegelAlarm and Inowas sensor web
+	2. Where the database is stored:
+		* In local repo
+		* updates are commited to git and github
+	3. Problem
+		* Github is not a good solution for hosting a database
+	4. Challenges
+		* host the database online
+		* deploy app.py online
+		* schedule runs on an online serve for this app_update.py
+	5. What to do next
+		* Check if when cloning this repo locally the app will work well          
+
+
 ## SMARTControl at a glance
 
 1. The **dashboard** is present in the file **app.py** and can be run from the commmand line by using: **python app.py**. Just make sure you are in the same folder ;)

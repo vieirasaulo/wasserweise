@@ -1,6 +1,7 @@
 '''
-Module where the update function is written
+Module where the functions that support the update function are written
 '''
+
 
 
 # '''
@@ -11,23 +12,16 @@ Module where the update function is written
 # import git
 # repo = git.Repo('.', search_parent_directories=True)
 # os.chdir(repo.working_tree_dir)
-
-import sys 
-
-'''
-ignore __pycache__
-add path to repo
-'''
-sys.dont_write_bytecode = True
-
+# sys.path.append(repo.working_tree_dir)
+# print(repo.working_tree_dir)
 
 
 '''
 Importing modules and libraries
 '''
-
-import numpy as np
 import os
+os.environ["GIT_PYTHON_REFRESH"] = "quiet"
+import numpy as np
 import pandas as pd
 from datetime import datetime
 import time
@@ -36,12 +30,10 @@ import SMARTControl.utils as utils
 from SMARTControl.api import PegelAlarm
 from SMARTControl.api import Inowas
 import SMARTControl.queries
-
-
 import git
 from github import Github
 
-fn = 'LOG_UPDATE.txt' 
+fn = 'Data/LOG_UPDATE.txt' 
     
 class GWL (Inowas):
     '''
@@ -184,16 +176,16 @@ class RL (PegelAlarm):
             print (txt)
             f.write(txt)     
 
-
-if __name__ == '__main__':
-        
+def app_update (git_commit: bool , github_push : bool ):
+    repo = git.Repo('.', search_parent_directories=True)
+    os.chdir(repo.working_tree_dir)
     
-    path = 'D:\\Repos\\PirnaCaseStudy\\Data'
-    database_fn = 'Database.db'
-    database_fn = path + '\\' + database_fn    
+    '''
+    Instantiating the get class
+    '''
+    
+    database_fn = 'Data/Database.db'
     Get = SMARTControl.queries.Get(database_fn)
-    
-    os.chdir(path)
     
     '''
     Update database locally
@@ -202,35 +194,88 @@ if __name__ == '__main__':
     r.Request()
     r.RiverAPItoSQL()
     InowasLongAPItoSQL(Get)
-
-    '''
-    Commit database locally
-    '''
-    repo = git.Repo('.', search_parent_directories=True)
-    path = repo.working_tree_dir
     
-    contents = os.listdir(path+'/Data')
-    database_list = ['Data/'+file for file in contents if 'db' in file or 'LOG' in file]
-
-    dt = str(datetime.now()).\
-        replace(':','-').\
-            split('.')[0]
-
+    if git_commit:
+        '''
+        Commit database locally
+        '''
+        repo = git.Repo('.', search_parent_directories=True)
+        path = repo.working_tree_dir
+        
+        contents = os.listdir(path+'/Data')
+        database_list = ['Data/'+file for file in contents if 'db' in file or 'LOG' in file]
+        
+        dt = str(datetime.now()).\
+        	replace(':','-').\
+        		split('.')[0]
+    
     commit_message = f'Database_LastUpdate-{dt}'
     for i in range(len(database_list)):
-        repo.index.add(database_list[i])
-        repo.git.commit( '-m', commit_message)
+    	repo.index.add(database_list[i])
+    	repo.git.commit( '-m', commit_message)
     
-    '''
-    Add to Github
-    '''
-    with open('D:\Repos\AccessToken.txt', 'r') as f:
-        token = f.readline()
     
-    g = Github(token)    
-    repo = g.get_user().get_repo('PirnaStudyCase')
-    contents = repo.get_contents('Data')
-    database_list = [file for file in contents if 'db' in file.path or 'LOG' in file.path]
+    if github_push:
+        '''
+        Add to Github
+        '''
+        with open('D:\Repos\AccessToken.txt', 'r') as f:
+        	token = f.readline()
+        
+        g = Github(token)    
+        repo = g.get_user().get_repo('PirnaStudyCase')
+        contents = repo.get_contents('Data')
+        database_list = [file for file in contents if 'db' in file.path or 'LOG' in file.path]
+        
+        for i in range(len(database_list)):
+        	repo.update_file(database_list[i].path, commit_message, commit_message, database_list[i].sha)
+
+# if __name__ == '__main__':
+        
     
-    for i in range(len(database_list)):
-        repo.update_file(database_list[i].path, commit_message, commit_message, database_list[i].sha)
+    # path = 'D:\\Repos\\PirnaCaseStudy\\Data'
+    # database_fn = 'Database.db'
+    # database_fn = path + '\\' + database_fn    
+    # Get = SMARTControl.queries.Get(database_fn)
+    
+    # os.chdir(path)
+    
+    # '''
+    # Update database locally
+    # '''
+    # r = RL(Get)
+    # r.Request()
+    # r.RiverAPItoSQL()
+    # InowasLongAPItoSQL(Get)
+
+    # '''
+    # Commit database locally
+    # '''
+    # repo = git.Repo('.', search_parent_directories=True)
+    # path = repo.working_tree_dir
+    
+    # contents = os.listdir(path+'/Data')
+    # database_list = ['Data/'+file for file in contents if 'db' in file or 'LOG' in file]
+
+    # dt = str(datetime.now()).\
+    #     replace(':','-').\
+    #         split('.')[0]
+
+    # commit_message = f'Database_LastUpdate-{dt}'
+    # for i in range(len(database_list)):
+    #     repo.index.add(database_list[i])
+    #     repo.git.commit( '-m', commit_message)
+    
+    # '''
+    # Add to Github
+    # '''
+    # with open('D:\Repos\AccessToken.txt', 'r') as f:
+    #     token = f.readline()
+    
+    # g = Github(token)    
+    # repo = g.get_user().get_repo('PirnaStudyCase')
+    # contents = repo.get_contents('Data')
+    # database_list = [file for file in contents if 'db' in file.path or 'LOG' in file.path]
+    
+    # for i in range(len(database_list)):
+    #     repo.update_file(database_list[i].path, commit_message, commit_message, database_list[i].sha)
