@@ -1,10 +1,17 @@
 import os
 import sys
-import SMARTControl as sc
+
 import pandas as pd
 import numpy as np
 
 from sqlalchemy import MetaData, Table
+import git
+
+repo = git.Repo('.', search_parent_directories=True)
+os.chdir(repo.working_tree_dir)
+
+import SMARTControl as sc
+
 
 database_fn = 'Database.db'
 

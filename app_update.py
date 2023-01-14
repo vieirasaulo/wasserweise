@@ -12,8 +12,8 @@ sys.dont_write_bytecode = True
 import SMARTControl
 
 '''
-App to update the database and store it and commit to git and github        
+App to update the database, store it and commit to git and github        
 '''
         
 if __name__ == '__main__':
-    SMARTControl.update.app_update(False , False)
+    SMARTControl.update.app_update(True , True)

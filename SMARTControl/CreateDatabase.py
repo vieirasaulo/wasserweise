@@ -2,12 +2,15 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy import Column, String, Integer, Float, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
+import git
 
-database_fn = 'Database.db'
-path = 'D:\\Repos\\PirnaCaseStudy\\Data'
-database_path = path + '\\' + database_fn
 
-os.chdir(path)
+repo = git.Repo('.', search_parent_directories=True)
+os.chdir(repo.working_tree_dir)
+
+database_fn = 'Data/Database.db'
+
+# os.chdir(path)
 engine = create_engine("sqlite:///{}".format(database_fn), echo = True)
 connection = engine.connect()
 base = declarative_base()
@@ -212,7 +215,3 @@ create the database
 '''
 if __name__ == '__main__':
     base.metadata.create_all(engine)
-
-
-
-os.chdir('..\\')
