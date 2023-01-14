@@ -16,4 +16,4 @@ App to update the database and store it and commit to git and github
 '''
         
 if __name__ == '__main__':
-    SMARTControl.update.app_update(False , True)
+    SMARTControl.update.app_update(False , False)

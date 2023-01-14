@@ -190,10 +190,10 @@ def app_update (git_commit: bool , github_push : bool ):
     '''
     Update database locally
     '''
-    #r = RL(Get)
-    #r.Request()
-    #r.RiverAPItoSQL()
-    #InowasLongAPItoSQL(Get)
+    r = RL(Get)
+    r.Request()
+    r.RiverAPItoSQL()
+    InowasLongAPItoSQL(Get)
 
     dt = str(datetime.now()).\
     replace(':','-').\
