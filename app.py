@@ -43,7 +43,7 @@ height = 580
 min_width = 700
 max_width = 1400
 
-os.chdir(path)
+#os.chdir(path)
 database_fn = 'Data/Database.db'
 Get = sc.queries.Get(database_fn)
 
