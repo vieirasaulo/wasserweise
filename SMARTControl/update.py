@@ -190,10 +190,15 @@ def app_update (git_commit: bool , github_push : bool ):
     '''
     Update database locally
     '''
-    r = RL(Get)
-    r.Request()
-    r.RiverAPItoSQL()
-    InowasLongAPItoSQL(Get)
+    #r = RL(Get)
+    #r.Request()
+    #r.RiverAPItoSQL()
+    #InowasLongAPItoSQL(Get)
+
+    dt = str(datetime.now()).\
+    replace(':','-').\
+        split('.')[0]
+    commit_message = f'Database_LastUpdate-{dt}'
     
     if git_commit:
         '''
@@ -205,14 +210,9 @@ def app_update (git_commit: bool , github_push : bool ):
         contents = os.listdir(path+'/Data')
         database_list = ['Data/'+file for file in contents if 'db' in file or 'LOG' in file]
         
-        dt = str(datetime.now()).\
-        	replace(':','-').\
-        		split('.')[0]
-    
-    commit_message = f'Database_LastUpdate-{dt}'
-    for i in range(len(database_list)):
-    	repo.index.add(database_list[i])
-    	repo.git.commit( '-m', commit_message)
+        for i in range(len(database_list)):
+            repo.index.add(database_list[i])
+            repo.git.commit( '-m', commit_message)
     
     
     if github_push:
