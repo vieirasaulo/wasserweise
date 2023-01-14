@@ -27,10 +27,10 @@ Pulling changes from github
 still try this
 '''
 
-git_dir = 'D:\Repos\PirnaCaseStudy'
-g = git.cmd.Git(git_dir)
-g.execute('git config pull.rebase false')
-g.pull()
+#git_dir = 'D:\Repos\PirnaCaseStudy'
+#g = git.cmd.Git(git_dir)
+#g.execute('git config pull.rebase false')
+#g.pull()
 
 
 '''
