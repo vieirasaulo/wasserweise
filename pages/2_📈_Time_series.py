@@ -1,7 +1,4 @@
-import os
 import pandas as pd
-import numpy as np
-from datetime import timedelta
 import panel as pn
 pn.extension('tabulator', sizing_mode="stretch_width")
 import hvplot.pandas
@@ -12,10 +9,10 @@ import SMARTControl as sc
 import streamlit as st
 import hvplot.pandas
 import holoviews as hv
-import plost
+import warnings
+warnings.filterwarnings('ignore')
 
-
-
+st.sidebar.header('SMART`Control`')
 
 
 @st.cache (allow_output_mutation=True)  # No need for TTL this time. It's static data :)
@@ -54,11 +51,20 @@ Get, g_df, gr_df = Querying()
 
 
 
-### Widgets
+### Sidebar
 
-wells_wid = st.selectbox(
+wells_wid = st.sidebar.selectbox(
     'Choose well',
     list(g_df.MonitoringPointName.unique()))
+
+st.sidebar.markdown('''
+---
+Created with ❤️ by [Saulo, Nicolás and Cláudia](https://github.com/SauloVSFh/PirnaStudyCase)
+''')
+
+##### MainPage
+
+sc.utils.header()
 
 def iTS ():
 
@@ -68,10 +74,6 @@ def iTS ():
     
     maxy , miny = 115, 107
     
-    # st.line_chart(
-    #     g_df,  x = 'Date', y = 'Value',
-    #     height = 500
-    #     )
     
     iScatterTS = g1_df.hvplot.scatter(
         
@@ -108,21 +110,22 @@ def iTS ():
     iScatterTS =  scatter_rg * iScatterTS
     
     
-    iScatterTS.opts(height = 600, width=1200, responsive=True)
+    iScatterTS.opts( responsive=True)
     
     
-    # col1, col2, col3 = st.columns((3,12,3))
-    # with col1:
-    #     st.write(' ')
+    col1, col2, col3 = st.columns((8,12,8))
+    with col1:
+        st.write(' ')
 
-    # with col2:
-    st.write(hv.render(iScatterTS, backend='bokeh'))
+    with col2:
+        st.write(hv.render(iScatterTS, backend='bokeh'))
     
-    # with col3:
-    #     st.write(' ')
-    
-    
-    
+    with col3:
+        st.write(' ')
 
 iTS()
+
+sc.utils.bottom()
+
+
 

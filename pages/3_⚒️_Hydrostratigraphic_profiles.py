@@ -1,9 +1,5 @@
-import streamlit as st
-
-import os
 import pandas as pd
 import numpy as np
-from datetime import timedelta
 import panel as pn
 pn.extension('tabulator', sizing_mode="stretch_width")
 import hvplot.pandas
@@ -14,11 +10,8 @@ import SMARTControl as sc
 import streamlit as st
 import hvplot.pandas
 import holoviews as hv
-import plost
-
-
-
-
+import warnings
+warnings.filterwarnings('ignore')
 
 @st.cache (allow_output_mutation=True)  # No need for TTL this time. It's static data :)
 def Querying():
@@ -57,12 +50,22 @@ def Querying():
 
 Get, HydroProfile_df, layers_df = Querying()
 
-drills_wid = st.selectbox(
+
+################## Sidebar
+st.sidebar.header('SMART`Control`')
+
+drills_wid = st.sidebar.selectbox(
     'Choose drill',
     list(HydroProfile_df.DrillName.unique()))
+st.sidebar.markdown('''
+---
+Created with ❤️ by [Saulo, Nicolás and Cláudia](https://github.com/SauloVSFh/PirnaStudyCase)
+''')
 
+################## Main Page
+sc.utils.header()
 
-######################### Plots
+st.markdown( '<br><br>' , unsafe_allow_html=True) 
 
 height = 500
 
@@ -77,58 +80,58 @@ def iHPV():
     ### <center>No data for this drill</center>
     '''
     
-    
-    if df.shape[0] == 0:
-        st.markdown (message)
-        
-    else:
-        df = df.replace(['EC logs', 'DPIL'], ['EC [mS/m]', 'Kr-DPIL[l/h*bar]'])
-        df = df.rename (columns = {"TestType" : "Variable"})
-        
-        iLineHP = df.hvplot.line(
-            x = 'Value',
-            y = 'Depth',
-            by = 'Variable',
-            alpha = 1,
-            logx = True,
-            grid = True,
-            ylabel = 'Depth (m)', 
-            xlabel = 'Log',
-            legend = True,
-            ylim = [df.Depth.min() - 2,1],
-            height = height,
-            width = 600
-    )
-
-        st.write(hv.render(iLineHP, backend='bokeh')) 
-        
-        
-    df_ = layers_df [
-        (layers_df.Drill== drills_wid)
-    ].reset_index(drop = True)  
-
-    #dropping columns that contain zero - getting rid of the layers that do not have landfills
-    df_ = df_.loc [:,(df_ != 0).any(axis=0) ]
-    
-    if df_.shape[0] == 0:
-        st.markdown (message)
-    
-    else:
-        iBarHP = df_.hvplot.bar(
-            x        = 'Drill',
-            stacked  = True,
-            xlim = [0,4],
-            ylim = [df.Depth.min() - 2,1],
-            color    = ['#ED7D31', '#FFC000', '#70AD47', '#9E480E', '#997300'],
-            height   = height,
-            width = 200,
-            xlabel = ''
+    col1, col2, col3, = st.columns((1,10,6))
+    with col1:
+        st.write(' ')
+    with col2:
+        if df.shape[0] == 0:
+            st.markdown (message, unsafe_allow_html=True)
+            
+        else:
+            df = df.replace(['EC logs', 'DPIL'], ['EC [mS/m]', 'Kr-DPIL[l/h*bar]'])
+            df = df.rename (columns = {"TestType" : "Variable"})
+            
+            iLineHP = df.hvplot.line(
+                x = 'Value',
+                y = 'Depth',
+                by = 'Variable',
+                alpha = 1,
+                logx = True,
+                grid = True,
+                ylabel = 'Depth (m)', 
+                xlabel = 'Log',
+                legend = True,
+                ylim = [df.Depth.min() - 2,1],
+                height = height,
+                width = 600
         )
     
+            st.write(hv.render(iLineHP, backend='bokeh')) 
+            
+    with col3:    
+        df_ = layers_df [
+            (layers_df.Drill== drills_wid)
+        ].reset_index(drop = True)  
+    
+        #dropping columns that contain zero - getting rid of the layers that do not have landfills
+        df_ = df_.loc [:,(df_ != 0).any(axis=0) ]
         
-        # iplot = (iLineHP + iBarHP)
-        st.write(hv.render(iBarHP, backend='bokeh'))
+        if df_.shape[0] == 0:
+            st.markdown (message, unsafe_allow_html=True)
         
-
+        else:
+            iBarHP = df_.hvplot.bar(
+                x        = 'Drill',
+                stacked  = True,
+                xlim = [0,4],
+                ylim = [df.Depth.min() - 2,1],
+                color    = ['#ED7D31', '#FFC000', '#70AD47', '#9E480E', '#997300'],
+                height   = height,
+                width = 200,
+                xlabel = 'Interpretation'
+            )
+        
+            st.write(hv.render(iBarHP, backend='bokeh'))
 
 iHPV()
+sc.utils.bottom()

@@ -7,6 +7,11 @@ import datetime
 import SMARTControl as sc
 import streamlit as st
 from streamlit_folium import st_folium as stf
+import warnings
+warnings.filterwarnings('ignore')
+
+
+st.sidebar.header('SMART`Control`')
 
 
 @st.cache (allow_output_mutation=True)  # No need for TTL this time. It's static data :)
@@ -19,14 +24,8 @@ def Querying():
     
     # First and last date
     start, end = Get.StartEndDate ()
-        
     
     return Get, MonitoringPointData_df ,GageData_df, start, end
-
-@st.cache (allow_output_mutation=True)
-def MapTile():
-    Map = sc.utils.Folium_map(Get)
-    return Map
 
 Get, MonitoringPointData_df ,GageData_df, start, end = Querying()
 
@@ -45,26 +44,16 @@ date_wid = st.sidebar.date_input(
 hour_wid = st.sidebar.slider('Hour', min_value=0, max_value=24, value=0, step=1)
 
 
+##### Main Page
+
+sc.utils.header()
+
 def iMap ():
     
-    st.markdown('### Potentiometric map of Pirna')
-    
-    # expander = st.expander("Control parameters")
-    
-    
-    # with expander:
-        
-        # scale_wid = st.slider('Size of arrows', min_value=1, max_value=100, value=10, step=1)
-        
-        # date_wid = st.date_input(
-        #     'Date',
-        #     min_value = datetime.date(start.year,start.month,start.day),
-        #     max_value = datetime.date(end.year,end.month,end.day),
-        #     value = datetime.date(end.year,end.month,end.day)
-        #                               )
-        
-        # hour_wid = st.slider('Hour', min_value=0, max_value=24, value=0, step=1)
-        
+    st.markdown(
+        "<h3 style='text-align: center; color: black;'>Potentiometric map of Pirna test field</h1>",
+                unsafe_allow_html=True)
+       
 
     
     date_wid_ = date_wid + pd.DateOffset(hours= hour_wid)
@@ -81,10 +70,13 @@ def iMap ():
                         'Date and Time', 'Type of measurement', 'Value (m.a.s.l.)', 'E', 'N']
     
     
+    wells = map_gdf.MonitoringPointName.unique()
+    wells_option = [well for well in wells if 'W' not in well]
+    
     wells_wid = st.sidebar.multiselect(
         'Choose wells',
-        map_gdf.MonitoringPointName.unique(),
-        map_gdf.MonitoringPointName.unique())
+        wells,
+        wells_option)
     
     map_gdf = map_gdf [map_gdf.MonitoringPointName.isin(wells_wid)].reset_index(drop=True)
     
@@ -97,7 +89,6 @@ def iMap ():
         arrows_df.index.isin( np.arange(0 , arrows_df.shape[0], 2))
                     ].reset_index (drop = True)
     
-        
     Map = sc.utils.Folium_map(Get)
     
     Map_contour = sc.utils.Folium_contour (    
@@ -106,9 +97,9 @@ def iMap ():
                                           )
     
     # arrows_df
-    Map = sc.utils.Folium_arrows(Map_contour , arrows_df )
+    m = sc.utils.Folium_arrows(Map_contour , arrows_df )
     
-    stf(Map, height = 500 , width = 1800)
+    stf(m, height = 600 , width = 1800)
     
     col1, col2, col3 = st.columns((4,12,4))
     with col1:
@@ -119,9 +110,13 @@ def iMap ():
     
     with col3:
         st.write(' ')
-    
-    
-    
+             
     
     
 iMap()
+sc.utils.bottom()
+
+st.sidebar.markdown('''
+---
+Created with ❤️ by [Saulo, Nicolás and Cláudia](https://github.com/SauloVSFh/PirnaStudyCase)
+''')

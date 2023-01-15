@@ -35,6 +35,7 @@ import geojsoncontour
 import panel as pn
 from datetime import datetime
 import time
+import streamlit as st
 
 def TimeToString (t: pd._libs.tslibs.timestamps.Timestamp):
     '''
@@ -877,4 +878,35 @@ def HydraulicGradient (Get_ : SMARTControl.queries.Get , size : int = 2000):
     
     print('Total run time:',t1-t0, 'with {} exceptions'.format(n) )
     return dt
+
+Inowas_fn = 'Assets/INOWASV1.png'
+SMARTControl_fn = 'Assets/SmartControl.png'
+Groundwatch_fn = 'Assets/Groundwatchv1.png'
+Python_fn = 'Assets/Python-logo-notext.png'
+PegelAlarm_fn = 'Assets/PegelAlarm.png'
+TUDresden_fn = 'Assets/TuDresden.png'
     
+def header ():
+    images_header = [Inowas_fn, SMARTControl_fn]
+    cols = st.columns (5)
+    cols = st.columns (5)
+    cols[0].write(' ')
+    cols[1].image(images_header[0], width = 200)
+    cols[2].write(' ')
+    cols[3].image(images_header[1], width = 300)
+    cols[4].write(' ')
+    st.markdown('<br>', unsafe_allow_html=True)
+
+def bottom ():
+    st.markdown( '<br><br><br>' , unsafe_allow_html=True) 
+    images_bottom = [Groundwatch_fn, Python_fn, PegelAlarm_fn , TUDresden_fn]
+    cols = st.columns (9)
+    cols[0].write(' ')
+    cols[1].image(images_bottom[0], width = 40)
+    cols[2].write(' ')
+    cols[3].image(images_bottom[1], width = 50)
+    cols[4].write(' ')
+    cols[5].image(images_bottom[2], width = 150)
+    cols[6].write(' ')
+    cols[7].image(images_bottom[3], width = 120)
+    cols[8].write(' ')
