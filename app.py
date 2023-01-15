@@ -469,4 +469,4 @@ dashboard = pn.Column(header ,body, bottom)
 # dashboard = pn.Column(bottom_r3)
 
 
-dashboard.servable()
+dashboard.show()
