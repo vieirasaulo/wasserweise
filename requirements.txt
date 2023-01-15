@@ -18,3 +18,4 @@ streamlit==1.16.0
 streamlit_folium==0.10.0
 windrose==1.8.1
 xarray==2022.11.0
+Plost==0.2.5
