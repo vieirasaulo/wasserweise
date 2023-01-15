@@ -469,5 +469,4 @@ dashboard = pn.Column(header ,body, bottom)
 # dashboard = pn.Column(bottom_r3)
 
 
-dashboard.show()
-# body_r2.show()
+dashboard.servable()
