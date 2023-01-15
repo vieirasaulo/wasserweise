@@ -483,9 +483,9 @@ def prepare_query (Get_ : SMARTControl.queries.Get, date_wid , crs_gcs : int = 4
             # df = df.drop('cut', axis =1)
             
             #Removing GWM05, 03 and G21neu - Values are weird
-            df = df.loc [df.MonitoringPointName != 'GWM05']
-            df = df.loc [df.MonitoringPointName != 'GWM03']
-            df = df.loc [df.MonitoringPointName != 'G21neu']
+            # df = df.loc [df.MonitoringPointName != 'GWM05']
+            # df = df.loc [df.MonitoringPointName != 'GWM03']
+            # df = df.loc [df.MonitoringPointName != 'G21neu']
             
             map_df = df.copy()
             map_gdf = gpd.GeoDataFrame(map_df, geometry = gpd.points_from_xy (map_df.E, map_df.N), crs = crs_gcs).reset_index(drop = True)
@@ -649,7 +649,7 @@ def Folium_map (Get_ , zoom_start = 17):
     '''
     
     df = Get_.MonitoringPointData()
-    map_center = df.N.mean(), df.E.mean() 
+    map_center = df.N.mean(), df.E.mean() + 0.003
     
     TileLayer = folium.TileLayer(
         tiles = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -659,7 +659,7 @@ def Folium_map (Get_ , zoom_start = 17):
         control = True
        )
 
-    Map = folium.Map(location =map_center, tiles="OpenStreetMap", zoom_start = zoom_start)
+    Map = folium.Map(location = map_center, tiles="OpenStreetMap", zoom_start = zoom_start)
     TileLayer.add_to(Map)
     return Map
         
@@ -753,6 +753,7 @@ def Folium_contour ( m : folium.folium.Map,
             #adding isolines 
             for row in isolines_gdf.iterrows():
                 row = row[1]    
+                row['level-value'] = np.round(row['level-value'], 2)
                 line = row.lines
                 folium.PolyLine(line,
                                 color = row.stroke,

@@ -249,8 +249,6 @@ def iPlot (date_wid, scalearrows_wid):
         grid_x_gcs , grid_y_gcs , grid_z_gcs, U , V = sc.utils.Interpolation_Gradient (map_gdf , crs_utm = 25833 ,
                                                                                         pixel_size = 10)
 
-        x = grid_x_gcs
-        y = grid_y_gcs
 
         arrows_df = sc.utils.arrow_head (grid_x_gcs , grid_y_gcs , grid_z_gcs, U , V , scale = scalearrows_wid)
         df = arrows_df [ arrows_df.index.isin( np.arange(0 ,

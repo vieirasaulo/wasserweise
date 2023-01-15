@@ -45,7 +45,9 @@ class Get:
             Session can be used to edit and update the database for more specific purposes.
         '''
 
-        engine = create_engine("sqlite:///{}??check_same_thread=False".format(database_fn), echo = False) #False to not show the output
+        engine = create_engine("sqlite:///{}?check_same_thread=False".format(database_fn),
+                               connect_args={'check_same_thread': False}, 
+                               echo = False) #False to not show the output
         connection = engine.connect()
           
         self.engine = engine
