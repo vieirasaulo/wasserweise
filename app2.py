@@ -23,7 +23,7 @@ st.set_page_config(layout='wide', initial_sidebar_state='expanded')
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-os.chdir(path)
+# os.chdir(path)
 database_fn = 'Data/Database.db' 
 Get = sc.queries.Get(database_fn) # Instantiating the variable
 
