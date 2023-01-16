@@ -95,7 +95,7 @@ def iTS_ ():
         x='Date', y='Value',
         color = 'MonitoringPointName',
         height = 600,
-        width = 1300,
+        # width = 1300,
         color_discrete_sequence = ['#01b2ff','green'],
         opacity = 0.5,
         
@@ -123,7 +123,7 @@ def iTS_ ():
     
 
     
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)
     
 
 

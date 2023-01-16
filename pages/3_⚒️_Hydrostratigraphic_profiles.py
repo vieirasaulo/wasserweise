@@ -136,13 +136,13 @@ def iHPV():
     
     fig.update_layout(
         barmode='stack',
-        width = 1300,
+        # width = 1300,
         height = 600,
         xaxis_title="<b>Log<b>",
         yaxis_title="<b>Depth<b>",
         )
             
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)
 
 iHPV()
 sc.utils.bottom()
