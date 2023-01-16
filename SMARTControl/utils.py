@@ -881,7 +881,7 @@ def HydraulicGradient (Get_ : SMARTControl.queries.Get , size : int = 2000):
 
 Inowas_fn = 'Assets/INOWASV1_white.png'
 SMARTControl_fn = 'Assets/SMARTControl_white.png'
-SMARTControl_fn_ = 'Assets/SMARTControl.png'
+SMARTControl_fn_ = 'Assets/SmartControl.png'
 Groundwatch_fn = 'Assets/Groundwatchv1.png'
 Python_fn = 'Assets/Python-logo-notext.png'
 PegelAlarm_fn = 'Assets/PegelAlarm.png'
