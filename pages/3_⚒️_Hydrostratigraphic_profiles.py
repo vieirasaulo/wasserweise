@@ -1,24 +1,16 @@
-import os
 import pandas as pd
 import numpy as np
 import panel as pn
 pn.extension('tabulator', sizing_mode="stretch_width")
-import hvplot.pandas
 import warnings
 warnings.filterwarnings('ignore')
-os.chdir('d:/repos/pirnacasestudy')
 import SMARTControl as sc
 import streamlit as st
-import hvplot.pandas
-import holoviews as hv
 import warnings
 warnings.filterwarnings('ignore')
 import utils_dashboard as utl
 import plotly.express as px
-import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from plotly.offline import plot
-# import dash_core_components as dcc
 
 
 def main():    

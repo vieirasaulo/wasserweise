@@ -119,7 +119,7 @@ def iMap ():
         st.write(' ')
 
     with col2:
-        st.write(print_df, width = 1500)
+        st.write(print_df)
     
     with col3:
         st.write(' ')
