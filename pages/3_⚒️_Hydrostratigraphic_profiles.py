@@ -3,7 +3,6 @@ import numpy as np
 import panel as pn
 pn.extension('tabulator', sizing_mode="stretch_width")
 import hvplot.pandas
-
 import warnings
 warnings.filterwarnings('ignore')
 import SMARTControl as sc
@@ -12,6 +11,20 @@ import hvplot.pandas
 import holoviews as hv
 import warnings
 warnings.filterwarnings('ignore')
+import utils_dashboard as utl
+
+def main():    
+    # Settings
+    utl.set_page_title('SMARTControl')
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    # Loading CSS
+    utl.local_css("frontend/css/streamlit.css")
+    utl.remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
+
+main()
+
+
+sc.utils.header()
 
 @st.cache (allow_output_mutation=True)  # No need for TTL this time. It's static data :)
 def Querying():
@@ -52,20 +65,11 @@ Get, HydroProfile_df, layers_df = Querying()
 
 
 ################## Sidebar
-st.sidebar.header('SMART`Control`')
 
 drills_wid = st.sidebar.selectbox(
     'Choose drill',
     list(HydroProfile_df.DrillName.unique()))
-st.sidebar.markdown('''
----
-Created with ❤️ by [Saulo, Nicolás and Cláudia](https://github.com/SauloVSFh/PirnaStudyCase)
-''')
 
-################## Main Page
-sc.utils.header()
-
-st.markdown( '<br><br>' , unsafe_allow_html=True) 
 
 height = 500
 

@@ -11,8 +11,39 @@ import hvplot.pandas
 import holoviews as hv
 import warnings
 warnings.filterwarnings('ignore')
+import utils_dashboard as utl
 
-st.sidebar.header('SMART`Control`')
+
+
+def main():    
+    # Settings
+    utl.set_page_title('SMARTControl')
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    # Loading CSS
+    utl.local_css("frontend/css/streamlit.css")
+    utl.remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
+    
+    st.markdown("""
+        <style>
+               .css-18e3th9 {
+                    padding-top: 0rem;
+                    padding-bottom: 10rem;
+                    padding-left: 5rem;
+                    padding-right: 5rem;
+                }
+               .css-1d391kg {
+                    padding-top: 3.5rem;
+                    padding-right: 1rem;
+                    padding-bottom: 3.5rem;
+                    padding-left: 1rem;
+                }
+        </style>
+        """, unsafe_allow_html=True)
+
+main()
+
+
+sc.utils.header()
 
 
 @st.cache (allow_output_mutation=True)  # No need for TTL this time. It's static data :)
@@ -20,14 +51,9 @@ def Querying():
     database_fn = 'Data/Database.db' 
     Get = sc.queries.Get(database_fn) # Instantiating the variable
     
-    MonitoringPointData_df = Get.MonitoringPointData(GageData = 1) 
-    GageData_df = Get.GageData
-    
     # First and last date
     start, end = Get.StartEndDate ()
-    
-    #All variables 
-    Variables_df = Get.Table('Variables')
+
     
     #Hydraulic heads
     Get.LongTimeSeries(0)
@@ -43,7 +69,6 @@ def Querying():
     g_df = g_df.rename (columns = {'Name' : 'MonitoringPointName'})
 
     gr_df = r_df.groupby(['MonitoringPointName', pd.Grouper(freq='D')])['Value'].mean().to_frame().reset_index()
-    g_df_ = pd.concat ([g_df, gr_df])
     
     return Get, g_df, gr_df
 
@@ -57,14 +82,6 @@ wells_wid = st.sidebar.selectbox(
     'Choose well',
     list(g_df.MonitoringPointName.unique()))
 
-st.sidebar.markdown('''
----
-Created with ❤️ by [Saulo, Nicolás and Cláudia](https://github.com/SauloVSFh/PirnaStudyCase)
-''')
-
-##### MainPage
-
-sc.utils.header()
 
 def iTS ():
 

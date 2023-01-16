@@ -9,10 +9,21 @@ import streamlit as st
 from streamlit_folium import st_folium as stf
 import warnings
 warnings.filterwarnings('ignore')
+import utils_dashboard as utl
 
 
-st.sidebar.header('SMART`Control`')
 
+def main():    
+    # Settings
+    utl.set_page_title('SMARTControl')
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    # Loading CSS
+    utl.local_css("frontend/css/streamlit.css")
+    utl.remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
+
+main()
+
+sc.utils.header()
 
 @st.cache (allow_output_mutation=True)  # No need for TTL this time. It's static data :)
 def Querying():
@@ -44,14 +55,11 @@ date_wid = st.sidebar.date_input(
 hour_wid = st.sidebar.slider('Hour', min_value=0, max_value=24, value=0, step=1)
 
 
-##### Main Page
-
-sc.utils.header()
 
 def iMap ():
     
     st.markdown(
-        "<h3 style='text-align: center; color: black;'>Potentiometric map of Pirna test field</h1>",
+        "<h3 style='text-align: center; color: black;'>Potentiometric map of Pirna test field</h3>",
                 unsafe_allow_html=True)
        
 
@@ -115,8 +123,3 @@ def iMap ():
     
 iMap()
 sc.utils.bottom()
-
-st.sidebar.markdown('''
----
-Created with ❤️ by [Saulo, Nicolás and Cláudia](https://github.com/SauloVSFh/PirnaStudyCase)
-''')

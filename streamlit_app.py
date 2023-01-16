@@ -1,5 +1,7 @@
 import sys 
+import os
 sys.dont_write_bytecode = True #ignore __pycache__
+os.chdir('d:/repos/pirnacasestudy')
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -9,28 +11,21 @@ np.seterr(divide='ignore', invalid='ignore')
 import SMARTControl as sc
 from pathlib import Path
 import streamlit as st
+import utils_dashboard as utl
 
 
-st.set_page_config(layout='wide', 
-                   page_icon = "📡",
-                   initial_sidebar_state='expanded')
+def main():    
+    # Settings
+    st.set_page_config(layout="wide", page_title='SMARTControl')
+    utl.set_page_title('SMARTControl')
+    st.set_option('deprecation.showPyplotGlobalUse', False)
+    # Loading CSS
+    utl.local_css("frontend/css/streamlit.css")
+    utl.remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
 
 
-with open('style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+main()
 
-
-
-
-
-# @st.cache (allow_output_mutation=True)
-##### SideBar
-st.sidebar.header('SMART`Control`')
-
-st.sidebar.markdown('''
----
-Created with ❤️ by [Saulo, Nicolás and Cláudia](https://github.com/SauloVSFh/PirnaStudyCase)
-''')
 
 
 #### Main page
@@ -43,5 +38,6 @@ def read_markdown_file(markdown_file):
 markdown_fn = 'README.md'
 intro_markdown = read_markdown_file(markdown_fn)
 st.markdown(intro_markdown, unsafe_allow_html=True)
+
 
 sc.utils.bottom()
