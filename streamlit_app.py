@@ -38,8 +38,37 @@ intro_markdown = read_markdown_file(markdown_fn)
 st.markdown(intro_markdown, unsafe_allow_html=True)
 
 
-
-
-
-
 sc.utils.bottom()
+
+############# Try image as hyperlink
+
+# import base64
+
+# @st.cache(allow_output_mutation=True)
+# def get_base64_of_bin_file(bin_file):
+#     with open(bin_file, 'rb') as f:
+#         data = f.read()
+#     return base64.b64encode(data).decode()
+
+# @st.cache(allow_output_mutation=True)
+# def get_img_with_href(local_img_path, target_url):
+#     img_format = os.path.splitext(local_img_path)[-1].replace('.', '')
+#     bin_str = get_base64_of_bin_file(local_img_path)
+#     html_code = f'''
+#         <a href="{target_url}">
+#             <img src="data:image/{img_format};base64,{bin_str}" />
+#         </a>'''
+#     return html_code
+
+
+
+# cols = st.columns((10,10))
+# with cols[0]:
+#     TUDresden_fn = 'Assets/TuDresden_white.png'
+#     gif_html = get_img_with_href(TUDresden_fn, 'https://docs.streamlit.io')
+#     st.markdown(gif_html, unsafe_allow_html=True)
+# with cols[1]:
+#     SMARTControl_fn = 'Assets/SMARTControl_white.png'
+#     gif_html = get_img_with_href(TUDresden_fn, 'https://docs.streamlit.io')
+#     st.markdown(gif_html, unsafe_allow_html=True)
+# # st.markdown(f"[![Foo]({TUDresden_fn})](http://google.com.au/)")
