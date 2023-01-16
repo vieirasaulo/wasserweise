@@ -891,7 +891,7 @@ def header ():
     images_header = [Inowas_fn, SMARTControl_fn]
     cols = st.columns (((1,10,1,10,1)))
     cols = st.columns (5)
-    cols[0].write(' ')
+    cols[0].write('<br><br><br><br>' , unsafe_allow_html=True) 
     cols[1].image(images_header[0], width = 200)
     cols[2].write(' ')
     cols[3].image(images_header[1], width = 300)
@@ -908,14 +908,14 @@ def header ():
                .css-18e3th9 {
                     padding-top: 0rem;
                     padding-bottom:0rem;
-                    padding-left: 0rem;
-                    padding-right: 0rem;
+                    padding-left: 5rem;
+                    padding-right: 5rem;
                 }
                .css-1d391kg {
                     padding-top: 0rem;
                     padding-right: 0rem;
-                    padding-bottom: 0rem;
-                    padding-left: 0rem;
+                    padding-bottom: 10rem;
+                    padding-left: 10rem;
                 }
         </style>
         """, unsafe_allow_html=True)

@@ -1,17 +1,16 @@
 import pandas as pd
 import panel as pn
 pn.extension('tabulator', sizing_mode="stretch_width")
-import hvplot.pandas
-
 import warnings
 warnings.filterwarnings('ignore')
 import SMARTControl as sc
 import streamlit as st
-import hvplot.pandas
-import holoviews as hv
 import warnings
 warnings.filterwarnings('ignore')
 import utils_dashboard as utl
+
+# import plotly.graph_objects as go
+import plotly.express as px
 
 
 
@@ -83,65 +82,52 @@ wells_wid = st.sidebar.selectbox(
     list(g_df.MonitoringPointName.unique()))
 
 
-def iTS ():
+def iTS_ ():
 
     g1_df = g_df [
         g_df.MonitoringPointName == wells_wid
     ].reset_index(drop = True)  
     
-    maxy , miny = 115, 107
+    g1_df_ = pd.concat([g1_df,gr_df])
     
-    
-    iScatterTS = g1_df.hvplot.scatter(
-        
-        x = 'Date', y = 'Value',
-        label = 'Diver Data',
-        # frame_height = 500,
-        alpha = 0.4,
-        grid = True, 
-        size = 50,
-        ylabel = 'Hydraulic head (m)', 
-        xlabel = 'Time',
-        color = 'aqua',
-        legend = True,
-        # ylim= ( miny , maxy)
-        
-        )
-    
-    scatter_rg = gr_df.hvplot.scatter(
-        
+    fig = px.scatter(
+        g1_df_,
         x='Date', y='Value',
-        ylabel = '[m]',
-        xlabel = 'Date', 
-        size = 50, 
-        # frame_height = 500,
-        # height = 500,
-        color = 'green',
-        label = "River Data",
-        alpha = 0.4, 
-        grid = True,
-        clabel = 'River head',
-        # ylim= ( miny , maxy)
+        color = 'MonitoringPointName',
+        height = 600,
+        width = 1400,
+        color_discrete_sequence = ['#01b2ff','green'],
+        opacity = 0.5,
+        
         )
     
-    iScatterTS =  scatter_rg * iScatterTS
-    
-    
-    iScatterTS.opts( responsive=True)
-    
-    
-    col1, col2, col3 = st.columns((8,12,8))
-    with col1:
-        st.write(' ')
 
-    with col2:
-        st.write(hv.render(iScatterTS, backend='bokeh'))
+    fig.update_layout(
+    font_color = '#7D7D7D', 
+    xaxis_title="<b>Time<b>",
+    yaxis_title="<b>[M.A.S.L.]</b>",
+    legend_title="<b>Monitoring point</b>",
+    yaxis=dict(color="black"),
+    )
+
     
-    with col3:
-        st.write(' ')
+    fig.update_yaxes( 
+        title_font_size = 20,
+        tickfont_family = 'Times New Roman'
+        )
+    
+    fig.update_xaxes( 
+        color="black",
+        tickfont_family = 'Times New Roman',
+        )
+    
 
-iTS()
+    
+    st.plotly_chart(fig)
+    
 
+
+iTS_()
 sc.utils.bottom()
 
 

@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 import panel as pn
@@ -5,6 +6,7 @@ pn.extension('tabulator', sizing_mode="stretch_width")
 import hvplot.pandas
 import warnings
 warnings.filterwarnings('ignore')
+os.chdir('d:/repos/pirnacasestudy')
 import SMARTControl as sc
 import streamlit as st
 import hvplot.pandas
@@ -12,6 +14,12 @@ import holoviews as hv
 import warnings
 warnings.filterwarnings('ignore')
 import utils_dashboard as utl
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from plotly.offline import plot
+# import dash_core_components as dcc
+
 
 def main():    
     # Settings
@@ -83,59 +91,66 @@ def iHPV():
     message = '''
     ### <center>No data for this drill</center>
     '''
-    
-    col1, col2, col3, = st.columns((1,10,6))
-    with col1:
-        st.write(' ')
-    with col2:
-        if df.shape[0] == 0:
-            st.markdown (message, unsafe_allow_html=True)
-            
-        else:
-            df = df.replace(['EC logs', 'DPIL'], ['EC [mS/m]', 'Kr-DPIL[l/h*bar]'])
-            df = df.rename (columns = {"TestType" : "Variable"})
-            
-            iLineHP = df.hvplot.line(
-                x = 'Value',
-                y = 'Depth',
-                by = 'Variable',
-                alpha = 1,
-                logx = True,
-                grid = True,
-                ylabel = 'Depth (m)', 
-                xlabel = 'Log',
-                legend = True,
-                ylim = [df.Depth.min() - 2,1],
-                height = height,
-                width = 600
-        )
-    
-            st.write(hv.render(iLineHP, backend='bokeh')) 
-            
-    with col3:    
-        df_ = layers_df [
-            (layers_df.Drill== drills_wid)
-        ].reset_index(drop = True)  
-    
-        #dropping columns that contain zero - getting rid of the layers that do not have landfills
-        df_ = df_.loc [:,(df_ != 0).any(axis=0) ]
+    ### plot1 profile
+    if df.shape[0] == 0:
+        st.markdown (message, unsafe_allow_html=True)
         
-        if df_.shape[0] == 0:
-            st.markdown (message, unsafe_allow_html=True)
+    else:
+        df = df.replace(['EC logs', 'DPIL'], ['EC [mS/m]', 'Kr-DPIL[l/h*bar]'])
+        df = df.rename (columns = {"TestType" : "Variable"})
         
-        else:
-            iBarHP = df_.hvplot.bar(
-                x        = 'Drill',
-                stacked  = True,
-                xlim = [0,4],
-                ylim = [df.Depth.min() - 2,1],
-                color    = ['#ED7D31', '#FFC000', '#70AD47', '#9E480E', '#997300'],
-                height   = height,
-                width = 200,
-                xlabel = 'Interpretation'
+        df['logx'] = np.log10(df.Value)
+        iLineHP = px.line(
+            df,
+            x = 'logx',
+            y = 'Depth',
+            color = 'Variable',
+            color_discrete_sequence = ['#01b2ff', '#1b15ea']
             )
         
-            st.write(hv.render(iBarHP, backend='bokeh'))
+
+        iLineHP.update_xaxes(automargin=True)        
+    
+    
+    #plot2 - stacked bar
+    df_ = layers_df [
+        (layers_df.Drill== drills_wid)
+    ].reset_index(drop = True)  
+
+    #dropping columns that contain zero - getting rid of the layers that do not have landfills
+    df_ = df_.loc [:,(df_ != 0).any(axis=0) ]
+    
+    if df_.shape[0] == 0:
+        st.markdown (message, unsafe_allow_html=True)
+        
+    else:
+        y = [col for col in df_.columns if not col.startswith('Drill')]
+    
+    iBarHP = px.bar(
+        df_ ,
+        x = 'Drill',
+        y = y,
+        color_discrete_sequence = ['#ED7D31', '#FFC000', '#70AD47', '#9E480E', '#997300']
+        )
+
+
+
+    ##### Subplots   
+    fig = make_subplots(rows=1, cols=2, shared_yaxes = True)
+    fig.add_trace(iLineHP['data'][0], row=1, col=1)
+    fig.add_trace(iLineHP['data'][1], row=1, col=1)
+    for elm in iBarHP['data']:
+        fig.add_trace(elm, row=1, col=2)
+    
+    fig.update_layout(
+        barmode='stack',
+        width = 1400,
+        height = 600,
+        xaxis_title="<b>Log<b>",
+        yaxis_title="<b>Depth<b>",
+        )
+            
+    st.plotly_chart(fig)
 
 iHPV()
 sc.utils.bottom()

@@ -13,15 +13,15 @@ import utils_dashboard as utl
 
 
 
-def main():    
+def main(fn):    
     # Settings
     utl.set_page_title('SMARTControl')
     st.set_option('deprecation.showPyplotGlobalUse', False)
     # Loading CSS
-    utl.local_css("frontend/css/streamlit.css")
+    utl.local_css(fn)
     utl.remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
 
-main()
+main("frontend/css/streamlit.css")
 
 sc.utils.header()
 
@@ -109,7 +109,12 @@ def iMap ():
     
     stf(m, height = 600 , width = 1800)
     
+    
+
+    
     col1, col2, col3 = st.columns((4,12,4))
+    
+    
     with col1:
         st.write(' ')
 
@@ -119,7 +124,5 @@ def iMap ():
     with col3:
         st.write(' ')
              
-    
-    
 iMap()
 sc.utils.bottom()
