@@ -1,7 +1,6 @@
 import sys 
 import os
 sys.dont_write_bytecode = True #ignore __pycache__
-os.chdir('d:/repos/pirnacasestudy')
 import warnings
 warnings.filterwarnings('ignore')
 
