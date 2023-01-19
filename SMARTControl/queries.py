@@ -22,7 +22,7 @@ from datetime import timedelta
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-# import SMARTControl.CreateDatabase as CreateDataBase 
+import numpy as np
 
 class Get:
     def __init__ (self, database_fn : str):
@@ -552,33 +552,9 @@ class Get:
             query to retrieve more data and check wrong values that are requested from INOWAS api
             It reduces the number of row of the query because the join function cuts out rows that have no divers
             '''
-            
-            query_debug = f'''
-            SELECT 
-            	PointsMeasurements.MonitoringPointID, PointsMeasurements.TimeStamp, PointsMeasurements.VariableID, PointsMeasurements.Value,
-            	MonitoringPoints.ID, MonitoringPoints.Name as MonitoringPointName, MonitoringPoints.PointID, MonitoringPoints.ReferenceAltitude as CaseTop, 
-            	Points.ID, Points.E, Points.N, 
-            	Variables.ID, Variables.Name AS Type,
-            	WellDiver.DiverID, WellDiver.DiverDepth, WellDiver.MonitoringPointID AS MonitoringPointID2,
-            	Divers.ID, Divers.Name as DiverName
-            FROM 
-            	PointsMeasurements
-            JOIN
-            	MonitoringPoints ON PointsMeasurements.MonitoringPointID = MonitoringPoints.ID
-            JOIN
-            	Points ON MonitoringPoints.PointID = Points.ID	
-            JOIN	
-            	Variables ON PointsMeasurements.VariableID = Variables.ID
-            JOIN
-            	WellDiver ON PointsMeasurements.MonitoringPointID = MonitoringPointID2
-            JOIN
-            	Divers ON WellDiver.DiverID = Divers.ID
-            WHERE
-                TimeStamp BETWEEN {l_ts} AND {u_ts}
-            '''
+        
             
             cols = ['MonitoringPointID', 'MonitoringPointName', 'Time', 'Type', 'Value', 'E', 'N']
-            cols_debug = ['MonitoringPointID', 'MonitoringPointName', 'DiverName', 'Time', 'Type', 'CaseTop', 'DiverDepth', 'Value', 'E', 'N']
             
             '''
             change here once it's fixed
@@ -614,6 +590,110 @@ class Get:
             self.Isolines_df = self.Isolines_Runs[Runs_key]           
     
     
+    def Isolines_debug (self , Year, Month, Day, Hour):
+
+        '''
+        Query used to retrieve and traceback monitoring data for a given variable and time. It retrieves more data and check wrong values that are requested from INOWAS api. It reduces the number of row of the query because the join function cuts out rows that have no divers
+       
+
+        Parameters
+        ----------
+        connection : sqlalchemy.engine.base.Connection
+        Year : int
+        Month : int
+        Day : int
+        Hour : int
+        
+        Returns
+        -------
+            Nothing. The resultant query is stored in a pandas.core.frame.DataFrame format as a class attribute.
+        '''
+    
+        start_time = time.perf_counter()
+
+        if Hour < 10:
+            Hour = '0'+str(Hour)
+    
+        datetime = pd.to_datetime(f'{Year}-{Month}-{Day} {Hour}')
+        
+        l_t = datetime - timedelta (hours = 0.5)
+        u_t = datetime + timedelta (hours = 0.5)
+        
+        l_ts = int(l_t.value / 1e9)
+        u_ts = int(u_t.value / 1e9)
+               
+        #generating Key for the class dictionary
+        Runs_key = str(datetime)+'_debug'
+
+        
+        if Runs_key not in self.Isolines_Runs:
+            #START FROM HERE - LINE WHERE 99
+            query_debug = f'''
+            SELECT 
+            	PointsMeasurements.MonitoringPointID, PointsMeasurements.TimeStamp, PointsMeasurements.VariableID, PointsMeasurements.Value,
+            	MonitoringPoints.ID, MonitoringPoints.Name as MonitoringPointName, MonitoringPoints.PointID, MonitoringPoints.ReferenceAltitude as CaseTop, 
+            	Points.ID, Points.E, Points.N, 
+            	Variables.ID, Variables.Name AS Type,
+            	WellDiver.DiverID, WellDiver.DiverDepth, WellDiver.MonitoringPointID AS MonitoringPointID2,
+            	Divers.ID, Divers.Name as DiverName
+            FROM 
+            	PointsMeasurements
+            JOIN
+            	MonitoringPoints ON PointsMeasurements.MonitoringPointID = MonitoringPoints.ID
+            JOIN
+            	Points ON MonitoringPoints.PointID = Points.ID	
+            JOIN	
+            	Variables ON PointsMeasurements.VariableID = Variables.ID
+            JOIN
+            	WellDiver ON PointsMeasurements.MonitoringPointID = MonitoringPointID2
+            JOIN
+            	Divers ON WellDiver.DiverID = Divers.ID
+            WHERE
+                TimeStamp BETWEEN {l_ts} AND {u_ts}
+            '''
+            print (l_ts, u_ts)
+            
+            cols = ['MonitoringPointID', 'MonitoringPointName', 'CaseTop', 'DiverDepth', 'DiverName', 'Time', 'Type', 'Value', 'E', 'N']
+            DataFrame = pd.read_sql(query_debug, con = self.connection)
+            DataFrame = DataFrame [DataFrame.VariableID.isin([0,7])] #indexing head and raingage
+            DataFrame['Time'] = pd.to_datetime(DataFrame.TimeStamp * 1e9)
+            # indexing columns    
+            DataFrame = DataFrame[cols]
+            DataFrame['DiverReading'] =  np.round(DataFrame.Value - DataFrame.CaseTop + DataFrame.DiverDepth, 2)
+            n = 2
+            # DataFrame ['CaseTop'] = np.round(DataFrame['CaseTop'],n )
+            # DataFrame ['DiverDepth'] = np.round(DataFrame['DiverDepth'],n )
+            # DataFrame ['DiverReading'] = np.round(DataFrame['DiverReading'],n )
+            
+            DataFrame = DataFrame.round({'CaseTop': n, 'DiverDepth': n, 'Value' : n, 'DiverReading' : n})
+            
+            ## taking average values for duplicated values
+            if DataFrame.duplicated(subset = ['MonitoringPointName']).any():
+                from numpy import nanmean                
+                # v = DataFrame.groupby('MonitoringPointName').Value.nanmean().values
+                v = DataFrame.groupby('MonitoringPointName').agg({'Value': [ nanmean]}).reset_index() 
+                
+                t = DataFrame.groupby('MonitoringPointName')['Time'].mean().values
+                df = DataFrame.drop_duplicates(subset = ['MonitoringPointID'])
+                df = df.drop(['Time'], axis = 1)
+                df['Value'] = v
+                df['Time'] = t
+                DataFrame = df.copy()
+
+            end_time = time.perf_counter()
+            self.RunTime = end_time - start_time
+            self.Isolines_debug_df = DataFrame
+            self.datetime = datetime
+            # self.VariableName = VariableName
+            #adding run to class attribute
+            self.Isolines_Runs [Runs_key] = DataFrame #store in class variable
+
+        #conditional to retrieve dataframe from class attribute! it minimizes querying time
+        else:
+            #getting object's attributes
+            self.Isolines_debug_df  = self.Isolines_Runs[Runs_key]           
+        
+
     def HydroProfile (self):
         '''
         Long query for the hydrogeological profiles. They can be index by drill.

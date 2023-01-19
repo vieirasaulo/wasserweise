@@ -8,10 +8,8 @@ import streamlit as st
 import warnings
 warnings.filterwarnings('ignore')
 import utils_dashboard as utl
-
-# import plotly.graph_objects as go
 import plotly.express as px
-
+from plotly.subplots import make_subplots
 
 
 def main():    
@@ -73,33 +71,53 @@ def Querying():
 
 Get, g_df, gr_df = Querying()
 
+@st.cache
+def convert_df(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode('utf-8')
 
 
-### Sidebar
-
-wells_wid = st.sidebar.selectbox(
-    'Choose well',
-    list(g_df.MonitoringPointName.unique()))
+### Sidebar Widgets
+wells_wid = st.sidebar.multiselect(
+    'Choose wells', 
+    options = list(g_df.MonitoringPointName.unique()),
+    default = None,
+    )
 
 
 def iTS_ ():
+    
+    fig = make_subplots(rows=1, cols=1)
+    
+    #plot river gage data
+    line_plot = px.line(
+        gr_df,
+        x='Date', y='Value',
+        color = 'MonitoringPointName',
+        color_discrete_sequence = ['green']
+        )
+    
+    fig.add_trace(line_plot['data'][0], row=1, col=1)
+    
 
     g1_df = g_df [
-        g_df.MonitoringPointName == wells_wid
+        g_df.MonitoringPointName.isin (wells_wid)
     ].reset_index(drop = True)  
+
     
-    g1_df_ = pd.concat([g1_df,gr_df])
-    
-    fig = px.scatter(
-        g1_df_,
+    #plot wells
+    scatter_plot = px.scatter(
+        g1_df,
         x='Date', y='Value',
         color = 'MonitoringPointName',
         height = 600,
-        # width = 1300,
-        color_discrete_sequence = ['#01b2ff','green'],
+        width = 1300,
+        color_discrete_sequence = px.colors.qualitative.Dark24,
         opacity = 0.5,
-        
         )
+    
+    for elm in scatter_plot['data']:
+        fig.add_trace(elm, row=1, col=1)
     
 
     fig.update_layout(
@@ -125,9 +143,27 @@ def iTS_ ():
     
     st.plotly_chart(fig, use_container_width=True)
     
+    # df = pd.concat([g1_df, gr_df])
+    # df.columns = ['Monitoring Point Name', 'Date and Time', 'Head (m.a.s.l.)']
+    
+    # return df
 
-
+# df = 
 iTS_()
+
+# #download button
+        
+# file_name = "TimeSeries_HydraulicHeads.csv"
+
+# csv = convert_df(df)
+
+# st.download_button(
+#     label="Download data as CSV",
+#     data=csv,
+#     file_name=file_name,
+#     mime='text/csv',
+# )
+
 sc.utils.bottom()
 
 

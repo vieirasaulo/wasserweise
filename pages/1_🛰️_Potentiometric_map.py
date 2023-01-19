@@ -35,10 +35,17 @@ def Querying():
     
     # First and last date
     start, end = Get.StartEndDate ()
-    
+        
     return Get, MonitoringPointData_df ,GageData_df, start, end
 
-Get, MonitoringPointData_df ,GageData_df, start, end = Querying()
+
+@st.cache
+def convert_df(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode('utf-8')
+
+
+Get, MonitoringPointData_df , GageData_df, start, end = Querying()
 
 
 #### Sidebar widgets
@@ -70,12 +77,14 @@ def iMap ():
 
     
     print_df = map_gdf [[col for col in map_gdf.columns if col != 'geometry']]
+    
+    
     print_df = pd.DataFrame(print_df)
     
     print_df = print_df.drop_duplicates('MonitoringPointName')
     
     print_df.columns = ['Monitoring Point ID', 'Monitoring Point Name', 
-                        'Date and Time', 'Type of measurement', 'Value (m.a.s.l.)', 'E', 'N']
+                        'Date and Time', 'Type of measurement', 'Head (m.a.s.l.)', 'E', 'N']
     
     
     wells = map_gdf.MonitoringPointName.unique()
@@ -109,20 +118,69 @@ def iMap ():
     
     stf(m, height = 600 , width = 1800)
     
+    return print_df
     
 
-    
-    col1, col2, col3 = st.columns((4,12,4))
-    
-    
-    with col1:
-        st.write(' ')
-
-    with col2:
-        st.write(print_df)
-    
-    with col3:
-        st.write(' ')
+def iTable (print_df):
+    if st.button ('Traceback diver readings'):
+        Get.Isolines_debug(
+            Year = pd.to_datetime(date_wid).year,
+            Month = pd.to_datetime(date_wid).month,
+            Day = pd.to_datetime(date_wid).day,
+            Hour = pd.to_datetime(date_wid).hour
+            )
+        
+        debug_df = Get.Isolines_debug_df.copy().reset_index(drop = True)
+        
+        debug_df.columns = [
+            'Monitoring Point ID', 'Monitoring Point Name', 'Case Top', 
+            'Diver Depth', 'Diver Name', 'Date and Time', 'Type of measurement', 
+            'Head (m.a.s.l.)', 'E', 'N', 'Diver Readings'
+            ]
+        
+        st.dataframe(
+            debug_df.style.format({
+                'Case Top': '{:.2f}',
+                'Head (m.a.s.l.)' : '{:.2f}',
+                'Diver Readings': '{:.2f}',
+                'Value': '{:.2f}',
+                'Diver Depth': '{:.2f}',
+                }),
+            use_container_width=True
+            )
              
-iMap()
+        df = debug_df
+    else:        
+        st.dataframe(
+            print_df.style.format({
+                'Case Top' : '{:.2f}',
+                'Head (m.a.s.l.)' : '{:.2f}',
+                'Diver Readings' : '{:.2f}',
+                'Value': '{:.2f}',
+                'DiverDepth': '{:.2f}',
+                }),
+            use_container_width=True
+        )
+        df = print_df
+    return df
+             
+print_df = iMap()
+df = iTable(print_df)
+
+#download button
+dt = str(df['Date and Time'].unique()[0]).\
+    replace(':','-').\
+        split('.')[0]
+        
+file_name = f"HydraulicHeads_{dt}.csv"
+
+csv = convert_df(df)
+
+st.download_button(
+    label="Download data as CSV",
+    data=csv,
+    file_name=file_name,
+    mime='text/csv',
+)
+
 sc.utils.bottom()

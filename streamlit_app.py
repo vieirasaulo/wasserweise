@@ -72,3 +72,20 @@ sc.utils.bottom()
 #     gif_html = get_img_with_href(TUDresden_fn, 'https://docs.streamlit.io')
 #     st.markdown(gif_html, unsafe_allow_html=True)
 # # st.markdown(f"[![Foo]({TUDresden_fn})](http://google.com.au/)")
+
+
+
+# PROBLEM HERE WITH THE SIZE OF THE IMAGE BUT IMAGE 
+
+# image can be resize as below:
+#     can base64 do the same?
+
+
+# from PIL import Image
+
+# bottom_image = st.file_uploader('', type='jpg', key=6)
+# if bottom_image is not None:
+#     image = Image.open(bottom_image)
+#     new_image = image.resize((600, 400))
+#     st.image(new_image)
+    

@@ -447,7 +447,8 @@ def prepare_query (Get_ : SMARTControl.queries.Get, date_wid , crs_gcs : int = 4
         Get_.Isolines(Year = pd.to_datetime(date_wid).year,
                                   Month = pd.to_datetime(date_wid).month,
                                   Day = pd.to_datetime(date_wid).day,
-                                  Hour = pd.to_datetime(date_wid).hour)
+                                  Hour = pd.to_datetime(date_wid).hour
+                                  )
     else:
        try: 
            Get_.Isolines(Year = date_wid.year,
@@ -889,12 +890,11 @@ TUDresden_fn = 'Assets/TuDresden_white.png'
     
 def header ():
     images_header = [Inowas_fn, SMARTControl_fn]
-    cols = st.columns (((1,10,1,10,1)))
-    cols = st.columns (5)
-    cols[0].write('<br><br><br><br>' , unsafe_allow_html=True) 
-    cols[1].image(images_header[0], width = 200)
+    cols = st.columns (((1,1,1,1.5,1)))
+    cols[0].write('<br><br><br><br><br><br>' , unsafe_allow_html=True) 
+    cols[1].image(images_header[0], use_column_width = True)
     cols[2].write(' ')
-    cols[3].image(images_header[1], width = 300)
+    cols[3].image(images_header[1], use_column_width = True)
     cols[4].write(' ')
     st.markdown('<br>', unsafe_allow_html=True)
     
@@ -929,15 +929,15 @@ def bottom ():
     images_bottom = [Groundwatch_fn, Python_fn, PegelAlarm_fn , TUDresden_fn]
     cols = st.columns (2)
 
-    cols = st.columns (9)
-    cols[0].markdown('<br> <br><br><br>' , unsafe_allow_html=True) 
-    cols[1].image(images_bottom[0], width = 40)
+    cols = st.columns ((1,0.7,1.5,0.8,1.5,2,0.8,1.5,1))
+    cols[0].markdown('<br><br><br><br><br><br><br><br>' , unsafe_allow_html=True) 
+    cols[1].image(images_bottom[0], width = 40, use_column_width = True)
     cols[2].write(' ')
-    cols[3].image(images_bottom[1], width = 55)
+    cols[3].image(images_bottom[1], width = 55, use_column_width = True)
     cols[4].write(' ')
-    cols[5].image(images_bottom[2], width = 200)
+    cols[5].image(images_bottom[2], use_column_width = True)
     cols[6].write(' ')
-    cols[7].image(images_bottom[3], width = 150)
+    cols[7].image(images_bottom[3], width = 150, use_column_width = True)
     cols[8].write(' ')
     
     

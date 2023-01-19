@@ -85,9 +85,10 @@ def iHPV():
     '''
     ### plot1 profile
     if df.shape[0] == 0:
-        st.markdown (message, unsafe_allow_html=True)
+        warning_profile = message
         
     else:
+        warning_profile = None
         df = df.replace(['EC logs', 'DPIL'], ['EC [mS/m]', 'Kr-DPIL[l/h*bar]'])
         df = df.rename (columns = {"TestType" : "Variable"})
         
@@ -102,7 +103,8 @@ def iHPV():
         
 
         iLineHP.update_xaxes(automargin=True)        
-    
+        
+        # st.plotly_chart(iLineHP, use_container_width=True)
     
     #plot2 - stacked bar
     df_ = layers_df [
@@ -113,36 +115,55 @@ def iHPV():
     df_ = df_.loc [:,(df_ != 0).any(axis=0) ]
     
     if df_.shape[0] == 0:
-        st.markdown (message, unsafe_allow_html=True)
+        warning_bar = message
         
     else:
+        warning_bar = None
         y = [col for col in df_.columns if not col.startswith('Drill')]
     
-    iBarHP = px.bar(
-        df_ ,
-        x = 'Drill',
-        y = y,
-        color_discrete_sequence = ['#ED7D31', '#FFC000', '#70AD47', '#9E480E', '#997300']
-        )
+        iBarHP = px.bar(
+            df_ ,
+            x = 'Drill',
+            y = y,
+            color_discrete_sequence = ['#ED7D31', '#FFC000', '#70AD47', '#9E480E', '#997300']
+            )
 
 
 
     ##### Subplots   
-    fig = make_subplots(rows=1, cols=2, shared_yaxes = True)
-    fig.add_trace(iLineHP['data'][0], row=1, col=1)
-    fig.add_trace(iLineHP['data'][1], row=1, col=1)
-    for elm in iBarHP['data']:
-        fig.add_trace(elm, row=1, col=2)
+    fig = make_subplots(rows=1, cols=2, shared_yaxes = True)    
     
+    if ((warning_profile is None) & (warning_bar is None )):
+        # fig = make_subplots(rows=1, cols=2, shared_yaxes = True)
+        fig.add_trace(iLineHP['data'][0], row=1, col=1)
+        fig.add_trace(iLineHP['data'][1], row=1, col=1)
+        for elm in iBarHP['data']:
+            fig.add_trace(elm, row=1, col=2)
+        
+    if ((warning_bar is not None ) & (warning_profile is None)):
+        #just plot time series
+        try:
+            fig.add_trace(iLineHP['data'][1], row=1, col=1)
+            fig.add_trace(iLineHP['data'][0], row=1, col=1)
+        except Exception:
+            fig.add_trace(iLineHP['data'][0], row=1, col=1)
+            
+    if ((warning_bar == None ) & (warning_profile != None)):
+        #only plot bar
+        for elm in iBarHP['data']:
+            fig.add_trace(elm, row=1, col=2)
+
+    #update layout and go
     fig.update_layout(
         barmode='stack',
-        # width = 1300,
-        height = 600,
+        height = 500,
         xaxis_title="<b>Log<b>",
         yaxis_title="<b>Depth<b>",
         )
             
     st.plotly_chart(fig, use_container_width=True)
+        
+        
 
 iHPV()
 sc.utils.bottom()

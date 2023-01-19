@@ -7,13 +7,21 @@ import numpy as np
 from sqlalchemy import MetaData, Table
 import git
 
-repo = git.Repo('.', search_parent_directories=True)
-os.chdir(repo.working_tree_dir)
+# repo = git.Repo('.', search_parent_directories=True)
+# os.chdir(repo.working_tree_dir)
+
+
+path = 'd:/repos/pirnacasestudy'
+
+sys.path.append(path)
+os.chdir(path)
+
 
 import SMARTControl as sc
 
+database_fn = 'Data/Database.db'
 
-database_fn = 'Database.db'
+
 
 Get = sc.queries.Get(database_fn) #instantiates the Get class 
 
@@ -60,6 +68,12 @@ TimeSeries
 
 # Get.Isolines(2021,12,20, 12)
 # df = Get.Isolines_df
+
+Get.Isolines_debug(2021,12,20, 12)
+df1 = Get.Isolines_debug_df
+
+
+print(df1.DiverDepth)
 # df_ = Get.DiverStatus()
 # df['DiverReading'] = - df.CaseTop + df.DiverDepth + df.Value
 
