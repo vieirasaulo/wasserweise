@@ -1,17 +1,19 @@
-import sys 
-sys.dont_write_bytecode = True #ignore __pycache__
-import pandas as pd
-import numpy as np
-np.seterr(divide='ignore', invalid='ignore')
-import datetime
-import SMARTControl as sc
-import streamlit as st
-from streamlit_folium import st_folium as stf
-import warnings
-warnings.filterwarnings('ignore')
-import utils_dashboard as utl
+@st.cache (allow_output_mutation=True)  
+def Import():
+    import sys 
+    sys.dont_write_bytecode = True #ignore __pycache__
+    import pandas as pd
+    import numpy as np
+    np.seterr(divide='ignore', invalid='ignore')
+    import datetime
+    import SMARTControl as sc
+    import streamlit as st
+    from streamlit_folium import st_folium as stf
+    import warnings
+    warnings.filterwarnings('ignore')
+    import utils_dashboard as utl
 
-
+Import()
 
 def main(fn):    
     # Settings
