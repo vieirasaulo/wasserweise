@@ -886,12 +886,12 @@ SMARTControl_fn_ = 'Assets/SmartControl.png'
 Groundwatch_fn = 'Assets/Groundwatchv1.png'
 Python_fn = 'Assets/Python-logo-notext.png'
 PegelAlarm_fn = 'Assets/PegelAlarm.png'
-TUDresden_fn = 'Assets/TuDresden_white.png'
+TUDresden_fn = 'Assets/TuDresden.png'
     
 def header ():
-    images_header = [Inowas_fn, SMARTControl_fn]
-    cols = st.columns (((1,1,1,1.5,1)))
-    cols[0].write('<br><br><br><br><br><br>' , unsafe_allow_html=True) 
+    images_header = [Inowas_fn, Groundwatch_fn]
+    cols = st.columns (((1,1,1,0.3,1)))
+    cols[0].write('<br><br><br><br><br><br><br><br>' , unsafe_allow_html=True) 
     cols[1].image(images_header[0], use_column_width = True)
     cols[2].write(' ')
     cols[3].image(images_header[1], use_column_width = True)
@@ -899,7 +899,7 @@ def header ():
     st.markdown('<br>', unsafe_allow_html=True)
     
     #### Sidebar
-    st.sidebar.image(SMARTControl_fn_)
+    st.sidebar.image(TUDresden_fn)
     st.markdown( '<br>' , unsafe_allow_html=True) 
     
     
@@ -926,10 +926,10 @@ def bottom ():
     st.markdown( '''
                 ---
                 ''' , unsafe_allow_html=True) 
-    images_bottom = [Groundwatch_fn, Python_fn, PegelAlarm_fn , TUDresden_fn]
+    images_bottom = [ Python_fn, PegelAlarm_fn , TUDresden_fn]
     cols = st.columns (2)
 
-    cols = st.columns ((1,0.7,1.5,0.8,1.5,2,0.8,1.5,1))
+    cols = st.columns ((1.5,0.8,1.5,2,0.8,1.5,1))
     cols[0].markdown('<br><br><br><br><br><br><br><br>' , unsafe_allow_html=True) 
     cols[1].image(images_bottom[0], width = 40, use_column_width = True)
     cols[2].write(' ')
@@ -937,8 +937,7 @@ def bottom ():
     cols[4].write(' ')
     cols[5].image(images_bottom[2], use_column_width = True)
     cols[6].write(' ')
-    cols[7].image(images_bottom[3], width = 150, use_column_width = True)
-    cols[8].write(' ')
+
     
     
     ##### sidebar
@@ -946,7 +945,9 @@ def bottom ():
     ---
     Created with ❤️ by 
     <a href="https://github.com/SauloVSFh/PirnaStudyCase" 
-    style="color: blue;">Saulo, Nicolás and Cláudia</a>
+    style="color: blue;">Saulo, Nicolás and Cláudia</a>, 
+    <a href="https://www.groundwatermaster.eu/" 
+    style="color: blue;">GroundwatCh students</a>
     ''', unsafe_allow_html=True) 
 
 
