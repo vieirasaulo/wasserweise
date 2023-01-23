@@ -392,3 +392,96 @@ The TOTAL for Diver's update running time was 693 s
 =======
 Database_LastUpdate-2023-01-14 17-33-50
 >>>>>>> 37f20fe76c393e91ac6314d1a1d473e739483b3f
+*************************************NEW RUN PEGELALARM.AT*************************************
+
+Program run on the following date: 2023-01-23 10:22:26.102578
+
+River data updated from ID 1823589 to ID 1823797
+
+End of the update for PEGELALARM.AT. The running time was 2 s
+
+#####################################END PEGELALARM.AT######################################*************************************NEW RUN INOWAS*************************************
+
+Program run on the following date: 2023-01-23 10:22:33.052917*************************************NEW RUN PEGELALARM.AT*************************************
+
+Program run on the following date: 2023-01-23 10:23:01.104312
+
+River data is up-to-date
+
+End of the update for PEGELALARM.AT. The running time was 1 s
+
+#####################################END PEGELALARM.AT######################################*************************************NEW RUN INOWAS*************************************
+
+Program run on the following date: 2023-01-23 10:23:08.214294
+Diver data updated from ID 1823798 to ID 1823909 for sensor I-2 parameter ec_25 in 16 s
+Diver data updated from ID 1823910 to ID 1824024 for sensor I-2 parameter ec in 20 s
+Diver data updated from ID 1824025 to ID 1824123 for sensor I-2 parameter h_level in 18 s
+Diver data updated from ID 1824124 to ID 1824372 for sensor I-2 parameter v_batt in 16 s
+Diver data updated from ID 1824373 to ID 1824488 for sensor I-2 parameter t in 15 s
+Diver data updated from ID 1824489 to ID 1824587 for sensor I-2 parameter ph in 15 s
+Diver data updated from ID 1824588 to ID 1824685 for sensor I-2 parameter ldo in 15 s
+ End of Update for sensor I-2
+
+
+Diver data updated from ID 1824686 to ID 1824760 for sensor I-3 parameter ec_25 in 15 s
+Diver data updated from ID 1824761 to ID 1824835 for sensor I-3 parameter ec in 15 s
+Diver data updated from ID 1824836 to ID 1824910 for sensor I-3 parameter h_level in 15 s
+Diver data updated from ID 1824911 to ID 1825152 for sensor I-3 parameter v_batt in 15 s
+Diver data updated from ID 1825153 to ID 1825227 for sensor I-3 parameter t in 15 s
+Diver data updated from ID 1825228 to ID 1825302 for sensor I-3 parameter ph in 16 s
+Diver data updated from ID 1825303 to ID 1825377 for sensor I-3 parameter ldo in 16 s
+ End of Update for sensor I-3
+
+
+Diver data updated from ID 1825378 to ID 1825393 for sensor I-5 parameter ec_25 in 16 s
+Diver data updated from ID 1825394 to ID 1825409 for sensor I-5 parameter ec in 16 s
+Diver data updated from ID 1825410 to ID 1825425 for sensor I-5 parameter h_level in 17 s
+Diver data updated from ID 1825426 to ID 1825677 for sensor I-5 parameter v_batt in 17 s
+Diver data updated from ID 1825678 to ID 1825693 for sensor I-5 parameter t in 17 s
+Diver data updated from ID 1825694 to ID 1825706 for sensor I-5 parameter ph in 16 s
+Diver data updated from ID 1825707 to ID 1825722 for sensor I-5 parameter ldo in 16 s
+ End of Update for sensor I-5
+
+
+No data for sensor 123 and parameter ec_25. Last update was: 2022-12-06 08:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor 123 and parameter ec. Last update was: 2022-12-06 08:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor 123 and parameter h_level. Last update was: 2022-12-06 08:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor 123 and parameter v_batt. Last update was: 2022-12-06 08:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor 123 and parameter t. Last update was: 2022-12-06 08:00:00. Check the portal of UIT. Running time was in 16 s
+ End of Update for sensor 123
+
+
+Diver data updated from ID 1825723 to ID 1825866 for sensor 124 parameter ec_25 in 16 s
+Diver data updated from ID 1825867 to ID 1826010 for sensor 124 parameter ec in 15 s
+Diver data updated from ID 1826011 to ID 1826154 for sensor 124 parameter h_level in 16 s
+Diver data updated from ID 1826155 to ID 1826298 for sensor 124 parameter v_batt in 16 s
+Diver data updated from ID 1826299 to ID 1826442 for sensor 124 parameter t in 15 s
+ End of Update for sensor 124
+
+
+Diver data updated from ID 1826443 to ID 1826658 for sensor 125 parameter ec_25 in 15 s
+Diver data updated from ID 1826659 to ID 1826874 for sensor 125 parameter ec in 15 s
+Diver data updated from ID 1826875 to ID 1827090 for sensor 125 parameter h_level in 15 s
+Diver data updated from ID 1827091 to ID 1827306 for sensor 125 parameter v_batt in 15 s
+Diver data updated from ID 1827307 to ID 1827522 for sensor 125 parameter t in 16 s
+ End of Update for sensor 125
+
+
+Diver data updated from ID 1827523 to ID 1827738 for sensor 126 parameter ec_25 in 15 s
+Diver data updated from ID 1827739 to ID 1827954 for sensor 126 parameter ec in 15 s
+Diver data updated from ID 1827955 to ID 1828170 for sensor 126 parameter h_level in 15 s
+Diver data updated from ID 1828171 to ID 1828386 for sensor 126 parameter v_batt in 16 s
+Diver data updated from ID 1828387 to ID 1828602 for sensor 126 parameter t in 16 s
+ End of Update for sensor 126
+
+
+Diver data updated from ID 1828603 to ID 1828818 for sensor 127 parameter ec_25 in 15 s
+Diver data updated from ID 1828819 to ID 1829034 for sensor 127 parameter ec in 15 s
+Diver data updated from ID 1829035 to ID 1829250 for sensor 127 parameter h_level in 15 s
+Diver data updated from ID 1829251 to ID 1829466 for sensor 127 parameter v_batt in 16 s
+Diver data updated from ID 1829467 to ID 1829682 for sensor 127 parameter t in 15 s
+ End of Update for sensor 127
+
+
+#####################################END INOWAS######################################
+The TOTAL for Diver's update running time was 733 s
