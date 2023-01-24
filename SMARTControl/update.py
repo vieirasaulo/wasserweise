@@ -177,8 +177,9 @@ class RL (PegelAlarm):
             f.write(txt)     
 
 def app_update (git_commit: bool , github_push : bool ):
-    repo = git.Repo('.', search_parent_directories=True)
-    os.chdir(repo.working_tree_dir)
+    #repo = git.Repo('.', search_parent_directories=True)
+    path = 'D:/Repos/PirnaCaseStudy'
+    os.chdir(path)
     
     '''
     Instantiating the get class
