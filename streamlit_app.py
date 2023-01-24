@@ -91,6 +91,8 @@ This work would not have been possible without the financial support of the Eras
 
 Check our [GitHub](https://github.com/SauloVSFh/PirnaStudyCase) to know more about it.
 
+---
+
 '''
 st.markdown(intro_markdown, unsafe_allow_html=True)
 
