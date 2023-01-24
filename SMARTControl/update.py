@@ -205,8 +205,9 @@ def app_update (git_commit: bool , github_push : bool ):
         '''
         Commit database locally
         '''
-        repo = git.Repo('.', search_parent_directories=True)
-        path = repo.working_tree_dir
+        #repo = git.Repo('.', search_parent_directories=True)
+        #path = repo.working_tree_dir
+        path = 'D:/Repos/PirnaCaseStudy'
         
         contents = os.listdir(path+'/Data')
         database_list = ['Data/'+file for file in contents if 'db' in file or 'LOG' in file]
