@@ -1,6 +1,4 @@
 import pandas as pd
-import panel as pn
-pn.extension('tabulator', sizing_mode="stretch_width")
 import warnings
 warnings.filterwarnings('ignore')
 import SMARTControl as sc

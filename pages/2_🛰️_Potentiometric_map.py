@@ -88,7 +88,7 @@ def iMap ():
     
     wells = map_gdf.MonitoringPointName.unique()
     wells_option = list(wells)
-    #wells_option = [well for well in wells if 'W' not in well]
+    wells_option = [well for well in wells if 'W' not in well]
     
     wells_wid = st.sidebar.multiselect(
         'Choose wells',
