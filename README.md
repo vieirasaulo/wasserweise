@@ -15,9 +15,8 @@ Study case developed by Saulo Vieira da Silva Filho, Nicolás Salazar and Claudi
 	3. Problem
 		* Github is not a good solution for hosting a database
 	4. Challenges
-		* host the database online
-		* deploy app.py online
-		* schedule runs on an online serve for this app_update.py
+		* Host the database out of github
+		* Deploy app_update.py online
 	5. What to do next
 		* Check if when cloning this repo locally the app will work well          
 
