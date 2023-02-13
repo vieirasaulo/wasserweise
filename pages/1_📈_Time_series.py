@@ -41,7 +41,7 @@ main()
 sc.utils.header()
 
 
-@st.cache ()
+@st.cache
 def Querying():
     database_fn = 'Data/Database.db' 
     Get = sc.queries.Get(database_fn) # Instantiating the variable
