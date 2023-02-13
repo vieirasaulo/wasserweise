@@ -41,7 +41,7 @@ main()
 sc.utils.header()
 
 
-@st.cache (allow_output_mutation=True)  # No need for TTL this time. It's static data :)
+@st.cache ()
 def Querying():
     database_fn = 'Data/Database.db' 
     Get = sc.queries.Get(database_fn) # Instantiating the variable
