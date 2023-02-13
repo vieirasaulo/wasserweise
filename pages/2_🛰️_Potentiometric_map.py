@@ -24,27 +24,32 @@ main("frontend/css/streamlit.css")
 
 sc.utils.header()
 
-@st.cache
-def Querying():
+@st.cache_resource
+def Connect():
     database_fn = 'Data/Database.db' 
     Get = sc.queries.Get(database_fn) # Instantiating the variable
-    
+    return Get
+
+Get = Connect()
+
+@st.cache_data
+def Querying():
     MonitoringPointData_df = Get.MonitoringPointData(GageData = 1) 
     GageData_df = Get.GageData
     
     # First and last date
     start, end = Get.StartEndDate ()
         
-    return Get, MonitoringPointData_df ,GageData_df, start, end
+    return MonitoringPointData_df ,GageData_df, start, end
 
 
-@st.cache
+@st.cache_data
 def convert_df(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf-8')
 
 
-Get, MonitoringPointData_df , GageData_df, start, end = Querying()
+MonitoringPointData_df , GageData_df, start, end = Querying()
 
 
 #### Sidebar widgets

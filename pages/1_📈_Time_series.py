@@ -41,7 +41,7 @@ main()
 sc.utils.header()
 
 
-@st.cache
+@st.cache_data
 def Querying():
     database_fn = 'Data/Database.db' 
     Get = sc.queries.Get(database_fn) # Instantiating the variable
@@ -65,11 +65,11 @@ def Querying():
 
     gr_df = r_df.groupby(['MonitoringPointName', pd.Grouper(freq='D')])['Value'].mean().to_frame().reset_index()
     
-    return Get, g_df, gr_df
+    return g_df, gr_df
 
-Get, g_df, gr_df = Querying()
+g_df, gr_df = Querying()
 
-@st.cache
+@st.cache_data
 def convert_df(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf-8')
