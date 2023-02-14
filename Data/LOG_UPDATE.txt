@@ -1386,4 +1386,102 @@ Diver data updated from ID 1855779 to ID 1855850 for sensor 127 parameter t in 1
 
 
 #####################################END INOWAS######################################
-The TOTAL for Diver's update running time was 682 s
+The TOTAL for Diver's update running time was 682 s*************************************NEW RUN PEGELALARM.AT*************************************
+
+Program run on the following date: 2023-02-14 17:17:03.516755
+
+River data updated from ID 1855851 to ID 1855874
+
+End of the update for PEGELALARM.AT. The running time was 1 s
+
+#####################################END PEGELALARM.AT######################################*************************************NEW RUN INOWAS*************************************
+
+Program run on the following date: 2023-02-14 17:17:10.219017
+No data for sensor I-2 and parameter ec_25. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor I-2 and parameter ec. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor I-2 and parameter h_level. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor I-2 and parameter v_batt. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor I-2 and parameter t. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor I-2 and parameter ph. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor I-2 and parameter ldo. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 16 s
+ End of Update for sensor I-2
+
+
+Diver data updated from ID 1855875 to ID 1855898 for sensor I-3 parameter ec_25 in 16 s
+Diver data updated from ID 1855899 to ID 1855922 for sensor I-3 parameter ec in 15 s
+Diver data updated from ID 1855923 to ID 1855946 for sensor I-3 parameter h_level in 15 s
+Diver data updated from ID 1855947 to ID 1855970 for sensor I-3 parameter v_batt in 15 s
+Diver data updated from ID 1855971 to ID 1855994 for sensor I-3 parameter t in 15 s
+Diver data updated from ID 1855995 to ID 1856018 for sensor I-3 parameter ph in 15 s
+Diver data updated from ID 1856019 to ID 1856042 for sensor I-3 parameter ldo in 15 s
+ End of Update for sensor I-3
+
+
+Diver data updated from ID 1856043 to ID 1856043 for sensor I-5 parameter ec_25 in 15 s
+Diver data updated from ID 1856044 to ID 1856044 for sensor I-5 parameter ec in 15 s
+Diver data updated from ID 1856045 to ID 1856045 for sensor I-5 parameter h_level in 15 s
+Diver data updated from ID 1856046 to ID 1856069 for sensor I-5 parameter v_batt in 15 s
+Diver data updated from ID 1856070 to ID 1856070 for sensor I-5 parameter t in 15 s
+Diver data updated from ID 1856071 to ID 1856071 for sensor I-5 parameter ph in 15 s
+Diver data updated from ID 1856072 to ID 1856072 for sensor I-5 parameter ldo in 16 s
+ End of Update for sensor I-5
+
+
+Diver data updated from ID 1856073 to ID 1856144 for sensor 123 parameter ec_25 in 15 s
+Diver data updated from ID 1856145 to ID 1856216 for sensor 123 parameter ec in 15 s
+Diver data updated from ID 1856217 to ID 1856288 for sensor 123 parameter h_level in 15 s
+Diver data updated from ID 1856289 to ID 1856360 for sensor 123 parameter v_batt in 15 s
+Diver data updated from ID 1856361 to ID 1856432 for sensor 123 parameter t in 15 s
+ End of Update for sensor 123
+
+
+No data for sensor 124 and parameter ec_25. Last update was: 2023-02-13 12:00:00. Check the portal of UIT. Running time was in 14 s
+No data for sensor 124 and parameter ec. Last update was: 2023-02-13 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 124 and parameter h_level. Last update was: 2023-02-13 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 124 and parameter v_batt. Last update was: 2023-02-13 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 124 and parameter t. Last update was: 2023-02-13 12:00:00. Check the portal of UIT. Running time was in 15 s
+ End of Update for sensor 124
+
+
+No data for sensor 125 and parameter ec_25. Last update was: 2023-02-12 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 125 and parameter ec. Last update was: 2023-02-12 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 125 and parameter h_level. Last update was: 2023-02-12 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 125 and parameter v_batt. Last update was: 2023-02-12 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 125 and parameter t. Last update was: 2023-02-12 12:00:00. Check the portal of UIT. Running time was in 15 s
+ End of Update for sensor 125
+
+
+Diver data updated from ID 1856433 to ID 1856504 for sensor 126 parameter ec_25 in 15 s
+Diver data updated from ID 1856505 to ID 1856576 for sensor 126 parameter ec in 16 s
+Diver data updated from ID 1856577 to ID 1856648 for sensor 126 parameter h_level in 15 s
+Diver data updated from ID 1856649 to ID 1856720 for sensor 126 parameter v_batt in 16 s
+Diver data updated from ID 1856721 to ID 1856792 for sensor 126 parameter t in 15 s
+ End of Update for sensor 126
+
+
+Diver data updated from ID 1856793 to ID 1856864 for sensor 127 parameter ec_25 in 16 s
+Diver data updated from ID 1856865 to ID 1856936 for sensor 127 parameter ec in 15 s
+Diver data updated from ID 1856937 to ID 1857008 for sensor 127 parameter h_level in 27 s
+Diver data updated from ID 1857009 to ID 1857080 for sensor 127 parameter v_batt in 30 s
+Diver data updated from ID 1857081 to ID 1857152 for sensor 127 parameter t in 24 s
+ End of Update for sensor 127
+
+
+#####################################END INOWAS######################################
+The TOTAL for Diver's update running time was 740 s*************************************NEW RUN PEGELALARM.AT*************************************
+
+Program run on the following date: 2023-02-14 17:58:25.635152
+
+River data is up-to-date
+
+End of the update for PEGELALARM.AT. The running time was 1 s
+
+#####################################END PEGELALARM.AT######################################*************************************NEW RUN PEGELALARM.AT*************************************
+
+Program run on the following date: 2023-02-14 17:59:16.232283
+
+River data is up-to-date
+
+End of the update for PEGELALARM.AT. The running time was 1 s
+
+#####################################END PEGELALARM.AT######################################
