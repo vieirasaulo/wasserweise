@@ -195,7 +195,7 @@ def app_update (git_commit: bool , github_push : bool ):
     print(r.url)
     r.Request()
     r.RiverAPItoSQL()
-    InowasLongAPItoSQL(Get)
+    # InowasLongAPItoSQL(Get)
 
     dt = str(datetime.now()).\
     replace(':','-').\
@@ -206,16 +206,17 @@ def app_update (git_commit: bool , github_push : bool ):
         '''
         Commit database locally
         '''
-        #repo = git.Repo('.', search_parent_directories=True)
-        #path = repo.working_tree_dir
-        path = 'D:/Repos/PirnaCaseStudy'
+        repo = git.Repo('.', search_parent_directories=True)
+        path = repo.working_tree_dir
+        # path = 'D:/Repos/PirnaCaseStudy'
         
         contents = os.listdir(path+'/Data')
         database_list = ['Data/'+file for file in contents if 'db' in file or 'LOG' in file]
         
-        for i in range(len(database_list)):
-            repo.index.add(database_list[i])
-            repo.git.commit( '-m', commit_message)
+        # for i in range(len(database_list)):
+            # repo.git.add(database_list[i])
+        repo.git.add(all=True)
+        repo.git.commit( '-m', commit_message)
     
     
     if github_push:
