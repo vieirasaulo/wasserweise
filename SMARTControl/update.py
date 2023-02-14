@@ -195,7 +195,7 @@ def app_update (git_commit: bool , github_push : bool ):
     print(r.url)
     r.Request()
     r.RiverAPItoSQL()
-    # InowasLongAPItoSQL(Get)
+    InowasLongAPItoSQL(Get)
 
     dt = str(datetime.now()).\
     replace(':','-').\
