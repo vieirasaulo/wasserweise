@@ -26,11 +26,12 @@ main()
 
 sc.utils.header()
 
-@st.cache (allow_output_mutation=True)  # No need for TTL this time. It's static data :)
+database_fn = 'Data/Database.db' 
+Get = sc.queries.Get(database_fn) # Instantiating the variable
+
+@st.cache_data
 def Querying():
-    database_fn = 'Data/Database.db' 
-    Get = sc.queries.Get(database_fn) # Instantiating the variable
-    
+
     Get.HydroProfile()
     HydroProfile_df = Get.HydroProfile_df.copy()
     HydroProfile_df.columns = [

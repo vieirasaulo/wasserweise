@@ -39,17 +39,13 @@ main()
 
 
 sc.utils.header()
+database_fn = 'Data/Database.db' 
+Get = sc.queries.Get(database_fn) # Instantiating the variable
 
-
-@st.cache_data
-def Querying():
-    database_fn = 'Data/Database.db' 
-    Get = sc.queries.Get(database_fn) # Instantiating the variable
-    
+@st.cache_data(ttl=3600)
+def Querying:
     # First and last date
     start, end = Get.StartEndDate ()
-
-    
     #Hydraulic heads
     Get.LongTimeSeries(0)
     df = Get.LongTimeSeries_df.copy()

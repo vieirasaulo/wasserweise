@@ -24,15 +24,10 @@ main("frontend/css/streamlit.css")
 
 sc.utils.header()
 
-@st.cache_resource
-def Connect():
-    database_fn = 'Data/Database.db' 
-    Get = sc.queries.Get(database_fn) # Instantiating the variable
-    return Get
+database_fn = 'Data/Database.db' 
+Get = sc.queries.Get(database_fn) # Instantiating the variable
 
-Get = Connect()
-
-@st.cache_data
+@st.cache_data(ttl=3600)
 def Querying():
     MonitoringPointData_df = Get.MonitoringPointData(GageData = 1) 
     GageData_df = Get.GageData
