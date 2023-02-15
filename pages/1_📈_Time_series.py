@@ -43,7 +43,7 @@ database_fn = 'Data/Database.db'
 Get = sc.queries.Get(database_fn) # Instantiating the variable
 
 @st.cache_data(ttl=3600)
-def Querying:
+def Querying():
     # First and last date
     start, end = Get.StartEndDate ()
     #Hydraulic heads

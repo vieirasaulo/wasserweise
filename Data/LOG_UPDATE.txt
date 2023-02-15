@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 *************************************NEW RUN PEGELALARM.AT*************************************
 
 Program run on the following date: 2023-01-06 13:23:49.432329
@@ -1612,3 +1613,6 @@ No data for sensor 127 and parameter t. Last update was: 2023-02-14 12:00:00. Ch
 
 #####################################END INOWAS######################################
 The TOTAL for Diver's update running time was 705 s
+=======
+Database_LastUpdate-2023-02-15 08-38-53
+>>>>>>> c4804f21f4ac3de2d270ab96315168e9b35e57ae
