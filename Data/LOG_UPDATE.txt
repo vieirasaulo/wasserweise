@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 *************************************NEW RUN PEGELALARM.AT*************************************
 
 Program run on the following date: 2023-01-06 13:23:49.432329
@@ -1525,3 +1526,89 @@ River data is up-to-date
 End of the update for PEGELALARM.AT. The running time was 1 s
 
 #####################################END PEGELALARM.AT######################################
+=======
+Database_LastUpdate-2023-02-14 18-22-52
+>>>>>>> e578dd925e4025f6accf6d22ad0604327f02e866
+*************************************NEW RUN PEGELALARM.AT*************************************
+
+Program run on the following date: 2023-02-15 08:27:07.611886
+
+River data updated from ID 1857154 to ID 1857167
+
+End of the update for PEGELALARM.AT. The running time was 1 s
+
+#####################################END PEGELALARM.AT######################################*************************************NEW RUN INOWAS*************************************
+
+Program run on the following date: 2023-02-15 08:27:14.918629
+No data for sensor I-2 and parameter ec_25. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 14 s
+No data for sensor I-2 and parameter ec. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 14 s
+No data for sensor I-2 and parameter h_level. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor I-2 and parameter v_batt. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 14 s
+No data for sensor I-2 and parameter t. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor I-2 and parameter ph. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor I-2 and parameter ldo. Last update was: 2023-02-12 02:00:00. Check the portal of UIT. Running time was in 15 s
+ End of Update for sensor I-2
+
+
+Diver data updated from ID 1857168 to ID 1857183 for sensor I-3 parameter ec_25 in 15 s
+Diver data updated from ID 1857184 to ID 1857199 for sensor I-3 parameter ec in 15 s
+Diver data updated from ID 1857200 to ID 1857203 for sensor I-3 parameter h_level in 16 s
+Diver data updated from ID 1857204 to ID 1857219 for sensor I-3 parameter v_batt in 16 s
+Diver data updated from ID 1857220 to ID 1857223 for sensor I-3 parameter t in 15 s
+Diver data updated from ID 1857224 to ID 1857227 for sensor I-3 parameter ph in 15 s
+Diver data updated from ID 1857228 to ID 1857231 for sensor I-3 parameter ldo in 15 s
+ End of Update for sensor I-3
+
+
+Diver data updated from ID 1857232 to ID 1857234 for sensor I-5 parameter ec_25 in 15 s
+Diver data updated from ID 1857235 to ID 1857237 for sensor I-5 parameter ec in 15 s
+Diver data updated from ID 1857238 to ID 1857240 for sensor I-5 parameter h_level in 15 s
+Diver data updated from ID 1857241 to ID 1857256 for sensor I-5 parameter v_batt in 16 s
+Diver data updated from ID 1857257 to ID 1857259 for sensor I-5 parameter t in 16 s
+Diver data updated from ID 1857260 to ID 1857262 for sensor I-5 parameter ph in 14 s
+Diver data updated from ID 1857263 to ID 1857265 for sensor I-5 parameter ldo in 16 s
+ End of Update for sensor I-5
+
+
+No data for sensor 123 and parameter ec_25. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 123 and parameter ec. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor 123 and parameter h_level. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor 123 and parameter v_batt. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 123 and parameter t. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+ End of Update for sensor 123
+
+
+No data for sensor 124 and parameter ec_25. Last update was: 2023-02-13 12:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor 124 and parameter ec. Last update was: 2023-02-13 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 124 and parameter h_level. Last update was: 2023-02-13 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 124 and parameter v_batt. Last update was: 2023-02-13 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 124 and parameter t. Last update was: 2023-02-13 12:00:00. Check the portal of UIT. Running time was in 14 s
+ End of Update for sensor 124
+
+
+No data for sensor 125 and parameter ec_25. Last update was: 2023-02-12 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 125 and parameter ec. Last update was: 2023-02-12 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 125 and parameter h_level. Last update was: 2023-02-12 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 125 and parameter v_batt. Last update was: 2023-02-12 12:00:00. Check the portal of UIT. Running time was in 16 s
+No data for sensor 125 and parameter t. Last update was: 2023-02-12 12:00:00. Check the portal of UIT. Running time was in 16 s
+ End of Update for sensor 125
+
+
+No data for sensor 126 and parameter ec_25. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 126 and parameter ec. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 126 and parameter h_level. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 126 and parameter v_batt. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 126 and parameter t. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+ End of Update for sensor 126
+
+
+No data for sensor 127 and parameter ec_25. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 127 and parameter ec. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 127 and parameter h_level. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 17 s
+No data for sensor 127 and parameter v_batt. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+No data for sensor 127 and parameter t. Last update was: 2023-02-14 12:00:00. Check the portal of UIT. Running time was in 15 s
+ End of Update for sensor 127
+
+
+#####################################END INOWAS######################################
+The TOTAL for Diver's update running time was 705 s
