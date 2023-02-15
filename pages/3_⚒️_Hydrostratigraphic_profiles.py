@@ -60,9 +60,9 @@ def Querying():
     ].reset_index(drop = True)  
 
     
-    return Get, plot_df, layers_df
+    return plot_df, layers_df
 
-Get, HydroProfile_df, layers_df = Querying()
+HydroProfile_df, layers_df = Querying()
 
 
 ################## Sidebar
