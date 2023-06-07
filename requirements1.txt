@@ -1,5 +1,4 @@
 folium==0.13.0
-geojsoncontour==0.4.0
 geopandas==0.11.1
 GitPython==3.1.30
 holoviews==1.14.8
@@ -16,6 +15,5 @@ requests==2.28.2
 scipy==1.9.3
 SQLAlchemy==1.4.44
 streamlit==1.18.0
-streamlit_folium==0.10.0
 windrose==1.8.1
 xarray==2022.11.0
