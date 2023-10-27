@@ -5,7 +5,7 @@ import streamlit as st
 import src.utils_dashboard as utl
 
 
-np.seterr(divide="ignore", invalid="ignore")
+# np.seterr(divide="ignore", invalid="ignore")
 
 
 def main():
