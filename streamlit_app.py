@@ -1,42 +1,38 @@
-import sys 
-import os
-sys.dont_write_bytecode = True #ignore __pycache__
-import warnings
-warnings.filterwarnings('ignore')
-
 import numpy as np
-np.seterr(divide='ignore', invalid='ignore')
-
-import SMARTControl as sc
+import wasserweise as ww
 from pathlib import Path
 import streamlit as st
-import utils_dashboard as utl
+import src.utils_dashboard as utl
 
 
-def main():    
+# np.seterr(divide="ignore", invalid="ignore")
+
+
+def main():
     # Settings
-    st.set_page_config(layout="wide", page_title='SMARTControl')
-    utl.set_page_title('SMARTControl')
-    st.set_option('deprecation.showPyplotGlobalUse', False)
+    st.set_page_config(layout="wide", page_title="SMARTControl")
+    utl.set_page_title("SMARTControl")
+    st.set_option("deprecation.showPyplotGlobalUse", False)
     # Loading CSS
     utl.local_css("frontend/css/streamlit.css")
-    utl.remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
+    utl.remote_css("https://fonts.googleapis.com/icon?family=Material+Icons")
 
 
 main()
 
 
-
 #### Main page
-sc.utils.header()
+ww.utils.header()
+
 
 def read_markdown_file(markdown_file):
     return Path(markdown_file).read_text()
 
-markdown_fn = 'README.md'
-intro_markdown = '''
+
+markdown_fn = "README.md"
+intro_markdown = """
 # About the Project
-This platform has been developed by students of the GroundwatCH program during their studies at the Technische Universität Dresden (TU Dresden), within the framework of the study project **“Development of simple digital tools for hydrogeological characterization and monitoring at the Pirna test field”.**
+This platform has been developed by students of the GroundwatCH program during their studies at the Techniwwhe Universität Dresden (TU Dresden), within the framework of the study project **“Development of simple digital tools for hydrogeological characterization and monitoring at the Pirna test field”.**
 
 The Pirna test field is located in the German Federal State of Saxony and it is a teaching and research field where different groundwater-related investigations have been performed in the last 15 years. It comprises more than 30 wells whereby some of them are equipped with measurement devices transmitting information to an online server, leading to huge opportunities to develop tools such as the one you are interacting with.
 
@@ -68,21 +64,21 @@ The platform is reproduced in an open code and it is a replicable tool. Up to da
 		* Host the database out of github
 		* Deploy app_update.py online
 	5. What to do next
-		* Check if when cloning this repo locally the app will work well        
+		* Check if when cloning this repo locally the app will work well
 
 #### Limitations and Future improvements
 
 The current identified limitations of the platform are listed as follow.
 
 * This tool for groundwater flow direction cannot be blindly trusted. A calibration with the divers installed in the field should be performed
-* It is considered a monitoring platform, not a platform to be used for models. It is limited to analyze and discuss the quality of the data and divers
+* It is considered a monitoring platform, not a platform to be used for models. It is limited to analyze and diwwuss the quality of the data and divers
 * It only considers hydraulic heads for determining the groundwater flow direction
 * No physical or chemical parameters (EC, T, etc.) are considered, despite more further parameters can be added in a future upgraded version
 
 
 #### Acknowledgments
 
-Our special thanks to our committed supervisors during our Study Project, specially to Dr. Ing. Thomas Fichtner from the Department of Hydrosciences of the Technische Universität Dresden, whose enthusiasm and knowledge guided us through all the project development. We would also like to express our particular thanks to Dr. Zhao Chen and Dr. Jana Glass for their support and recommendations.
+Our special thanks to our committed supervisors during our Study Project, specially to Dr. Ing. Thomas Fichtner from the Department of Hydrowwiences of the Techniwwhe Universität Dresden, whose enthusiasm and knowledge guided us through all the project development. We would also like to express our particular thanks to Dr. Zhao Chen and Dr. Jana Glass for their support and recommendations.
 
 This work would not have been possible without the financial support of the Erasmus+ Programme of the European Union. We would like to specially recognize the effort of all those involved in the **Joint Master Programme in Groundwater and Global Change Impacts and Adaptation.**
 
@@ -93,11 +89,11 @@ Check our [GitHub](https://github.com/SauloVSFh/PirnaStudyCase) to know more abo
 
 ---
 
-'''
+"""
 st.markdown(intro_markdown, unsafe_allow_html=True)
 
 
-sc.utils.bottom()
+ww.utils.bottom()
 
 ############# Try image as hyperlink
 
@@ -120,7 +116,6 @@ sc.utils.bottom()
 #     return html_code
 
 
-
 # cols = st.columns((10,10))
 # with cols[0]:
 #     TUDresden_fn = 'Assets/TuDresden_white.png'
@@ -133,8 +128,7 @@ sc.utils.bottom()
 # # st.markdown(f"[![Foo]({TUDresden_fn})](http://google.com.au/)")
 
 
-
-# PROBLEM HERE WITH THE SIZE OF THE IMAGE BUT IMAGE 
+# PROBLEM HERE WITH THE SIZE OF THE IMAGE BUT IMAGE
 
 # image can be resize as below:
 #     can base64 do the same?
@@ -147,5 +141,5 @@ sc.utils.bottom()
 #     image = Image.open(bottom_image)
 #     new_image = image.resize((600, 400))
 #     st.image(new_image)
-    
+
 #
