@@ -1,2 +1,0 @@
-geojsoncontour==0.4.0
-streamlit_folium==0.10.0
